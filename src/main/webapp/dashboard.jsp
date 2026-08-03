@@ -1,0 +1,404 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<meta charset="UTF-8">
+
+<title>Bus Tracking Management System</title>
+
+<link rel="stylesheet" href="css/style.css">
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>Bus Tracking Management System</h1>
+
+    <!-- Navigation -->
+
+    <div class="tabs">
+
+        <button class="tabButton active" onclick="showTab('bus')">
+            Manage Bus
+        </button>
+
+        <button class="tabButton" onclick="showTab('stop')">
+            Manage Stop
+        </button>
+
+        <button class="tabButton" onclick="showTab('route')">
+            Manage Route
+        </button>
+
+        <button class="tabButton" onclick="showTab('schedule')">
+            Manage Schedule
+        </button>
+
+    </div>
+
+    <!-- ================= BUS ================= -->
+
+    <div id="bus" class="tabContent">
+
+        <div class="card">
+
+            <h2>Manage Bus</h2>
+
+            <div class="formGrid">
+
+                <div class="formGroup">
+
+                    <label>Bus ID</label>
+
+                    <input type="text" id="busId">
+
+                </div>
+
+                <div class="formGroup">
+
+                    <label>Bus Number</label>
+
+                    <input type="text" id="busNumber">
+
+                </div>
+
+                <div class="formGroup">
+
+                    <label>Bus Name</label>
+
+                    <input type="text" id="busName">
+
+                </div>
+
+                <div class="formGroup">
+
+                    <label>Bus Type</label>
+
+                    <select id="busType">
+
+                        <option>Express</option>
+                        <option>Deluxe</option>
+                        <option>Ultra Deluxe</option>
+                        <option>AC Sleeper</option>
+
+                    </select>
+
+                </div>
+
+                <div class="formGroup">
+
+                    <label>Route</label>
+
+                    <select id="routeId"></select>
+
+                </div>
+
+            </div>
+
+            <br>
+
+            <button class="btnAdd" onclick="addBus()">Add Bus</button>
+
+            <button class="btnUpdate" onclick="updateBus()">Update Bus</button>
+
+            <button class="btnDelete" onclick="deleteBus()">Delete Bus</button>
+
+            <button class="btnClear" onclick="clearBus()">Clear</button>
+
+        </div>
+
+        <div class="card">
+
+            <h2>Bus List</h2>
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>Bus ID</th>
+                        <th>Bus Number</th>
+                        <th>Bus Name</th>
+                        <th>Bus Type</th>
+                        <th>Route</th>
+                        <th>Action</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody id="busTableBody"></tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+    <!-- ================= STOP ================= -->
+
+    <div id="stop" class="tabContent" style="display:none;">
+
+        <div class="card">
+
+            <h2>Manage Stop</h2>
+
+            <div class="formGrid">
+
+                <div class="formGroup">
+
+                    <label>Stop ID</label>
+
+                    <input type="text" id="stopId">
+
+                </div>
+
+                <div class="formGroup">
+
+                    <label>Stop Name</label>
+
+                    <input type="text" id="stopName">
+
+                </div>
+
+            </div>
+
+            <br>
+
+            <button class="btnAdd" onclick="addStop()">Add Stop</button>
+
+            <button class="btnUpdate" onclick="updateStop()">Update Stop</button>
+
+            <button class="btnDelete" onclick="deleteStop()">Delete Stop</button>
+
+            <button class="btnClear" onclick="clearStop()">Clear</button>
+
+        </div>
+
+        <div class="card">
+
+            <h2>Stop List</h2>
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>Stop ID</th>
+                        <th>Stop Name</th>
+                        <th>Action</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody id="stopTableBody"></tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+    <!-- ================= ROUTE ================= -->
+
+    <div id="route" class="tabContent" style="display:none;">
+
+        <div class="card">
+
+            <h2>Manage Route</h2>
+
+            <div class="formGrid">
+
+                <div class="formGroup">
+
+                    <label>Route ID</label>
+
+                    <input type="text" id="routeId">
+
+                </div>
+
+                <div class="formGroup">
+
+                    <label>Route Name</label>
+
+                    <input type="text" id="routeName">
+
+                </div>
+
+                <div class="formGroup">
+
+                    <label>Select Stops</label>
+
+                    <select id="routeStops" multiple size="6"></select>
+
+                </div>
+
+            </div>
+
+            <br>
+
+            <button class="btnAdd" onclick="addRoute()">Add Route</button>
+
+            <button class="btnUpdate" onclick="updateRoute()">Update Route</button>
+
+            <button class="btnDelete" onclick="deleteRoute()">Delete Route</button>
+
+            <button class="btnClear" onclick="clearRoute()">Clear</button>
+
+        </div>
+
+        <div class="card">
+
+            <h2>Route List</h2>
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>Route ID</th>
+                        <th>Route Name</th>
+                        <th>Stops</th>
+                        <th>Action</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody id="routeTableBody"></tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+    <!-- ================= SCHEDULE ================= -->
+
+    <div id="schedule" class="tabContent" style="display:none;">
+
+        <div class="card">
+
+            <h2>Manage Schedule</h2>
+
+            <div class="formGrid">
+
+                <div class="formGroup">
+
+                    <label>Schedule ID</label>
+
+                    <input type="text" id="scheduleId">
+
+                </div>
+
+                <div class="formGroup">
+
+                    <label>Bus</label>
+
+                    <select id="scheduleBusId"></select>
+
+                </div>
+
+                <div class="formGroup">
+
+                    <label>Route</label>
+
+                    <select id="scheduleRouteId"></select>
+
+                </div>
+
+                <div class="formGroup">
+
+                    <label>Departure Time</label>
+
+                    <input type="time" id="departureTime">
+
+                </div>
+
+                <div class="formGroup">
+
+                    <label>Arrival Time</label>
+
+                    <input type="time" id="arrivalTime">
+
+                </div>
+
+                <div class="formGroup">
+
+                    <label>Day</label>
+
+                    <select id="day">
+
+                        <option>Monday</option>
+                        <option>Tuesday</option>
+                        <option>Wednesday</option>
+                        <option>Thursday</option>
+                        <option>Friday</option>
+                        <option>Saturday</option>
+                        <option>Sunday</option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+            <br>
+
+            <button class="btnAdd" onclick="addSchedule()">Add Schedule</button>
+
+            <button class="btnUpdate" onclick="updateSchedule()">Update Schedule</button>
+
+            <button class="btnDelete" onclick="deleteSchedule()">Delete Schedule</button>
+
+            <button class="btnClear" onclick="clearSchedule()">Clear</button>
+
+        </div>
+
+        <div class="card">
+
+            <h2>Schedule List</h2>
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>Schedule ID</th>
+                        <th>Bus</th>
+                        <th>Route</th>
+                        <th>Departure</th>
+                        <th>Arrival</th>
+                        <th>Day</th>
+                        <th>Action</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody id="scheduleTableBody"></tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script src="js/dashboard.js"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,173 @@
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial,Helvetica,sans-serif;
+}
+
+body{
+    background:#f4f6f9;
+    padding:20px;
+}
+
+.container{
+    width:95%;
+    margin:auto;
+}
+
+h1{
+    text-align:center;
+    margin-bottom:20px;
+    color:#2c3e50;
+}
+
+.tabs{
+    display:flex;
+    gap:10px;
+    margin-bottom:20px;
+}
+
+.tabButton{
+    padding:12px 25px;
+    border:none;
+    background:#3498db;
+    color:white;
+    cursor:pointer;
+    border-radius:5px;
+    font-size:15px;
+}
+
+.tabButton:hover{
+    background:#2980b9;
+}
+
+.tabButton.active{
+    background:#2c3e50;
+}
+
+.card{
+    background:white;
+    padding:20px;
+    border-radius:8px;
+    box-shadow:0 2px 8px rgba(0,0,0,.15);
+    margin-bottom:20px;
+}
+
+.card h2{
+    margin-bottom:20px;
+    color:#34495e;
+}
+
+.formGrid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:15px;
+}
+
+.formGroup{
+    display:flex;
+    flex-direction:column;
+}
+
+.formGroup label{
+    margin-bottom:6px;
+    font-weight:bold;
+}
+
+.formGroup input,
+.formGroup select{
+    padding:10px;
+    border:1px solid #ccc;
+    border-radius:5px;
+    font-size:14px;
+}
+
+button{
+    padding:10px 18px;
+    border:none;
+    color:white;
+    cursor:pointer;
+    border-radius:5px;
+    margin-right:10px;
+    margin-top:10px;
+}
+
+.btnAdd{
+    background:#27ae60;
+}
+
+.btnUpdate{
+    background:#f39c12;
+}
+
+.btnDelete{
+    background:#e74c3c;
+}
+
+.btnClear{
+    background:#7f8c8d;
+}
+
+.btnAdd:hover{
+    background:#229954;
+}
+
+.btnUpdate:hover{
+    background:#d68910;
+}
+
+.btnDelete:hover{
+    background:#c0392b;
+}
+
+.btnClear:hover{
+    background:#616a6b;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:15px;
+}
+
+table th{
+    background:#3498db;
+    color:white;
+    padding:12px;
+}
+
+table td{
+    border:1px solid #ddd;
+    padding:10px;
+    text-align:center;
+}
+
+table tr:nth-child(even){
+    background:#f8f9fa;
+}
+
+table tr:hover{
+    background:#ecf0f1;
+}
+
+table button{
+    background:#3498db;
+    margin:0;
+    padding:6px 12px;
+}
+
+table button:hover{
+    background:#21618c;
+}
+
+@media(max-width:768px){
+
+    .formGrid{
+        grid-template-columns:1fr;
+    }
+
+    .tabs{
+        flex-direction:column;
+    }
+
+}
