@@ -1,173 +1,355 @@
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    font-family:Arial,Helvetica,sans-serif;
-}
+[3:38 PM] Madhumitha M
+* {
 
-body{
-    background:#f4f6f9;
-    padding:20px;
-}
+    margin: 0;
 
-.container{
-    width:95%;
-    margin:auto;
-}
+    padding: 0;
 
-h1{
-    text-align:center;
-    margin-bottom:20px;
-    color:#2c3e50;
-}
+    box-sizing: border-box;
 
-.tabs{
-    display:flex;
-    gap:10px;
-    margin-bottom:20px;
-}
+    font-family: Arial, Helvetica, sans-serif;
 
-.tabButton{
-    padding:12px 25px;
-    border:none;
-    background:#3498db;
-    color:white;
-    cursor:pointer;
-    border-radius:5px;
-    font-size:15px;
 }
+ 
+body {
 
-.tabButton:hover{
-    background:#2980b9;
+    background: #f4f6f9;
+
+    padding: 20px;
+
 }
+ 
+.container {
 
-.tabButton.active{
-    background:#2c3e50;
+    width: 95%;
+
+    margin: auto;
+
 }
+ 
+h1 {
 
-.card{
-    background:white;
-    padding:20px;
-    border-radius:8px;
-    box-shadow:0 2px 8px rgba(0,0,0,.15);
-    margin-bottom:20px;
+    text-align: center;
+
+    margin-bottom: 20px;
+
+    color: #2c3e50;
+
 }
+ 
+.tabs {
 
-.card h2{
-    margin-bottom:20px;
-    color:#34495e;
+    display: flex;
+
+    gap: 10px;
+
+    margin-bottom: 20px;
+
 }
+ 
+.tabButton {
 
-.formGrid{
-    display:grid;
-    grid-template-columns:repeat(2,1fr);
-    gap:15px;
+    padding: 12px 25px;
+
+    border: none;
+
+    background: #3498db;
+
+    color: white;
+
+    cursor: pointer;
+
+    border-radius: 5px;
+
+    font-size: 15px;
+
+    transition: background 0.2s ease;
+
 }
+ 
+.tabButton:hover {
 
-.formGroup{
-    display:flex;
-    flex-direction:column;
+    background: #2980b9;
+
 }
+ 
+.tabButton.active {
 
-.formGroup label{
-    margin-bottom:6px;
-    font-weight:bold;
+    background: #2c3e50;
+
 }
+ 
+.card {
 
+    background: white;
+
+    padding: 20px;
+
+    border-radius: 8px;
+
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+
+    margin-bottom: 20px;
+
+}
+ 
+.card h2 {
+
+    margin-bottom: 20px;
+
+    color: #34495e;
+
+}
+ 
+.formGrid {
+
+    display: grid;
+
+    grid-template-columns: repeat(2, 1fr);
+
+    gap: 15px;
+
+}
+ 
+.formGroup {
+
+    display: flex;
+
+    flex-direction: column;
+
+}
+ 
+/* Span full width across 2 columns for large controls like multi-select when needed */
+
+.formGroup.fullWidth {
+
+    grid-column: span 2;
+
+}
+ 
+.formGroup label {
+
+    margin-bottom: 6px;
+
+    font-weight: bold;
+
+    color: #2c3e50;
+
+}
+ 
 .formGroup input,
-.formGroup select{
-    padding:10px;
-    border:1px solid #ccc;
-    border-radius:5px;
-    font-size:14px;
+
+.formGroup select {
+
+    padding: 10px;
+
+    border: 1px solid #ccc;
+
+    border-radius: 5px;
+
+    font-size: 14px;
+
+    outline: none;
+
+    transition: border-color 0.2s;
+
 }
+ 
+.formGroup input:focus,
 
-button{
-    padding:10px 18px;
-    border:none;
-    color:white;
-    cursor:pointer;
-    border-radius:5px;
-    margin-right:10px;
-    margin-top:10px;
+.formGroup select:focus {
+
+    border-color: #3498db;
+
 }
+ 
+/* Specific styling for multi-select dropdown (Stops list) */
 
-.btnAdd{
-    background:#27ae60;
+.formGroup select[multiple] {
+
+    padding: 5px;
+
+    height: 120px;
+
 }
+ 
+.formGroup select[multiple] option {
 
-.btnUpdate{
-    background:#f39c12;
+    padding: 6px 10px;
+
+    border-bottom: 1px solid #f0f0f0;
+
+    cursor: pointer;
+
 }
+ 
+.formGroup select[multiple] option:hover {
 
-.btnDelete{
-    background:#e74c3c;
+    background-color: #ebf5fb;
+
 }
+ 
+button {
 
-.btnClear{
-    background:#7f8c8d;
+    padding: 10px 18px;
+
+    border: none;
+
+    color: white;
+
+    cursor: pointer;
+
+    border-radius: 5px;
+
+    margin-right: 10px;
+
+    margin-top: 10px;
+
+    font-weight: bold;
+
+    transition: background 0.2s ease;
+
 }
+ 
+.btnAdd {
 
-.btnAdd:hover{
-    background:#229954;
+    background: #27ae60;
+
 }
+ 
+.btnUpdate {
 
-.btnUpdate:hover{
-    background:#d68910;
+    background: #f39c12;
+
 }
+ 
+.btnDelete {
 
-.btnDelete:hover{
-    background:#c0392b;
+    background: #e74c3c;
+
 }
+ 
+.btnClear {
 
-.btnClear:hover{
-    background:#616a6b;
+    background: #7f8c8d;
+
 }
+ 
+.btnAdd:hover {
 
-table{
-    width:100%;
-    border-collapse:collapse;
-    margin-top:15px;
+    background: #229954;
+
 }
+ 
+.btnUpdate:hover {
 
-table th{
-    background:#3498db;
-    color:white;
-    padding:12px;
+    background: #d68910;
+
 }
+ 
+.btnDelete:hover {
 
-table td{
-    border:1px solid #ddd;
-    padding:10px;
-    text-align:center;
+    background: #c0392b;
+
 }
+ 
+.btnClear:hover {
 
-table tr:nth-child(even){
-    background:#f8f9fa;
+    background: #616a6b;
+
 }
+ 
+table {
 
-table tr:hover{
-    background:#ecf0f1;
+    width: 100%;
+
+    border-collapse: collapse;
+
+    margin-top: 15px;
+
 }
+ 
+table th {
 
-table button{
-    background:#3498db;
-    margin:0;
-    padding:6px 12px;
+    background: #3498db;
+
+    color: white;
+
+    padding: 12px;
+
+    text-align: center;
+
 }
+ 
+table td {
 
-table button:hover{
-    background:#21618c;
+    border: 1px solid #ddd;
+
+    padding: 10px;
+
+    text-align: center;
+
+    vertical-align: middle;
+
 }
+ 
+table tr:nth-child(even) {
 
-@media(max-width:768px){
+    background: #f8f9fa;
 
-    .formGrid{
-        grid-template-columns:1fr;
+}
+ 
+table tr:hover {
+
+    background: #ecf0f1;
+
+}
+ 
+table button {
+
+    background: #3498db;
+
+    margin: 2px;
+
+    padding: 6px 12px;
+
+}
+ 
+table button:hover {
+
+    background: #21618c;
+
+}
+ 
+/* Responsive adjustments */
+
+@media (max-width: 768px) {
+
+    .formGrid {
+
+        grid-template-columns: 1fr;
+
+    }
+ 
+    .formGroup.fullWidth {
+
+        grid-column: span 1;
+
+    }
+ 
+    .tabs {
+
+        flex-direction: column;
+
+    }
+ 
+    table {
+
+        display: block;
+
+        overflow-x: auto;
+
     }
 
-    .tabs{
-        flex-direction:column;
-    }
-
 }
+ 
