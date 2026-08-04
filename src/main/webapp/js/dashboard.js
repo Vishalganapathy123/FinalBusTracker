@@ -1,5 +1,3 @@
-[3:39 PM] Madhumitha M
-// Dynamic Base URL Detection
 
 const API = `${window.location.origin}/BusTracker/api/admin`;
  
