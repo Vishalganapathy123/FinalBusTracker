@@ -11,6 +11,7 @@
 <title>Bus Tracking Management System</title>
 
 <link rel="stylesheet" href="css/style.css">
+<link rel="icon" href="data:,">
 
 </head>
 
@@ -24,19 +25,19 @@
 
     <div class="tabs">
 
-        <button class="tabButton active" onclick="showTab('bus')">
+        <button class="tabButton active" onclick="showTab('bus', event)">
             Manage Bus
         </button>
 
-        <button class="tabButton" onclick="showTab('stop')">
+        <button class="tabButton" onclick="showTab('stop', event)">
             Manage Stop
         </button>
 
-        <button class="tabButton" onclick="showTab('route')">
+        <button class="tabButton" onclick="showTab('route', event)">
             Manage Route
         </button>
 
-        <button class="tabButton" onclick="showTab('schedule')">
+        <button class="tabButton" onclick="showTab('schedule', event)">
             Manage Schedule
         </button>
 
@@ -222,7 +223,8 @@
 
                     <label>Route ID</label>
 
-                    <input type="text" id="routeId">
+                    <!-- ID renamed to 'routeInputId' to match dashboard.js -->
+                    <input type="text" id="routeInputId">
 
                 </div>
 
@@ -397,6 +399,7 @@
 
 </div>
 
+<!-- Make sure dashboard.js path is placed inside src/main/webapp/js/ -->
 <script src="js/dashboard.js"></script>
 
 </body>
