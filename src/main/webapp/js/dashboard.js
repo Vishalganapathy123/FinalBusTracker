@@ -1,1127 +1,756 @@
-
-const API = `${window.location.origin}/BusTracker/api/admin`;
+[3:58 PM] Madhumitha M
+var API = window.location.origin + "/BusTracker/api/admin";
  
 /* ===========================
-
    HELPER FUNCTIONS
-
 =========================== */
  
-const getVal = (id) => {
-
-  const el = document.getElementById(id);
-
+function getVal(id) {
+  var el = document.getElementById(id);
   return el ? el.value.trim() : "";
-
-};
+}
  
-const setVal = (id, val) => {
-
-  const el = document.getElementById(id);
-
-  if (el) el.value = val ?? "";
-
-};
+function setVal(id, val) {
+  var el = document.getElementById(id);
+  if (el) el.value = (val !== null && val !== undefined) ? val : "";
+}
+ 
+// Sanitizes text to safely insert inside HTML string templates
+function escapeHtml(str) {
+  if (str === null || str === undefined) return "";
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
  
 /* Generic Helper to Populate Dropdowns */
-
-const populateDropdown = (elementId, items, valueKey, labelKey, defaultText) => {
-
-  const select = document.getElementById(elementId);
-
+function populateDropdown(elementId, items, valueKey, labelKey, defaultText) {
+  var select = document.getElementById(elementId);
   if (!select) return;
  
-  const options = items
-
-    .map((item) => `<option value="${item[valueKey]}">${typeof labelKey === "function" ? labelKey(item) : item[labelKey]}</option>`)
-
+  var options = items
+    .map(function(item) {
+      var val = escapeHtml(item[valueKey]);
+      var lblText = (typeof labelKey === "function") ? labelKey(item) : item[labelKey];
+      var lbl = escapeHtml(lblText);
+      return '<option value="' + val + '">' + lbl + '</option>';
+    })
     .join("");
  
-  select.innerHTML = `<option value="">${defaultText}</option>${options}`;
-
-};
+  select.innerHTML = '<option value="">' + escapeHtml(defaultText) + '</option>' + options;
+}
  
 /* ===========================
-
    TAB NAVIGATION
-
 =========================== */
  
 function showTab(tabId, evt) {
-
-  document.querySelectorAll(".tabContent").forEach((tab) => {
-
-    tab.style.display = "none";
-
-  });
+  var tabs = document.querySelectorAll(".tabContent");
+  for (var i = 0; i < tabs.length; i++) {
+    tabs[i].style.display = "none";
+  }
  
-  document.querySelectorAll(".tabButton").forEach((btn) => {
-
-    btn.classList.remove("active");
-
-  });
+  var btns = document.querySelectorAll(".tabButton");
+  for (var j = 0; j < btns.length; j++) {
+    btns[j].classList.remove("active");
+  }
  
-  const targetTab = document.getElementById(tabId);
-
+  var targetTab = document.getElementById(tabId);
   if (targetTab) targetTab.style.display = "block";
  
-  if (evt?.currentTarget) {
-
+  if (evt && evt.currentTarget) {
     evt.currentTarget.classList.add("active");
-
   }
  
   // Lazy load data based on selected tab
-
   switch (tabId) {
-
     case "bus":
-
       loadBus();
-
       loadRouteDropdownForBus();
-
       break;
-
     case "stop":
-
       loadStop();
-
       break;
-
     case "route":
-
       loadRoute();
-
       loadStopsForRoute();
-
       break;
-
     case "schedule":
-
       loadSchedule();
-
       loadBusDropdown();
-
       loadRouteDropdown();
-
       break;
-
   }
-
 }
  
 /* ===========================
-
    BUS CRUD
-
 =========================== */
  
-async function loadBus() {
-
-  try {
-
-    const res = await fetch(`${API}/bus`);
-
-    if (!res.ok) throw new Error("Failed to load buses");
-
-    const data = await res.json();
+function loadBus() {
+  fetch(API + "/bus")
+    .then(function(res) {
+      if (!res.ok) throw new Error("Failed to load buses");
+      return res.json();
+    })
+    .then(function(data) {
+      var body = document.getElementById("busTableBody");
+      if (!body) return;
  
-    const body = document.getElementById("busTableBody");
-
-    if (!body) return;
- 
-    body.innerHTML = data
-
-      .map((bus) => {
-
-        const rId = bus.routeId || "";
-
-        return `
-<tr>
-<td>${bus.busId}</td>
-<td>${bus.busNumber}</td>
-<td>${bus.busName}</td>
-<td>${bus.busType}</td>
-<td>${rId}</td>
-<td>
-<button class="btnUpdate" onclick="editBus('${bus.busId}', '${bus.busNumber}', '${bus.busName}', '${bus.busType}', '${rId}')">Edit</button>
-</td>
-</tr>
-
-        `;
-
-      })
-
-      .join("");
-
-  } catch (err) {
-
-    console.error(err);
-
-  }
-
-}
- 
-async function loadRouteDropdownForBus() {
-
-  try {
-
-    const res = await fetch(`${API}/route`);
-
-    const data = await res.json();
-
-    populateDropdown("routeId", data, "routeId", "routeName", "-- Select Route --");
-
-  } catch (err) {
-
-    console.error(err);
-
-  }
-
-}
- 
-async function addBus() {
-
-  const bus = {
-
-    busId: getVal("busId"),
-
-    busNumber: getVal("busNumber"),
-
-    busName: getVal("busName"),
-
-    busType: getVal("busType"),
-
-    routeId: getVal("routeId")
-
-  };
- 
-  try {
-
-    const res = await fetch(`${API}/bus`, {
-
-      method: "POST",
-
-      headers: { "Content-Type": "application/json" },
-
-      body: JSON.stringify(bus)
-
+      body.innerHTML = data
+        .map(function(bus) {
+          var rId = bus.routeId || "";
+          return (
+            "<tr>" +
+            "<td>" + escapeHtml(bus.busId) + "</td>" +
+            "<td>" + escapeHtml(bus.busNumber) + "</td>" +
+            "<td>" + escapeHtml(bus.busName) + "</td>" +
+            "<td>" + escapeHtml(bus.busType) + "</td>" +
+            "<td>" + escapeHtml(rId) + "</td>" +
+            "<td>" +
+            '<button class="btnUpdate" ' +
+            'data-id="' + escapeHtml(bus.busId) + '" ' +
+            'data-number="' + escapeHtml(bus.busNumber) + '" ' +
+            'data-name="' + escapeHtml(bus.busName) + '" ' +
+            'data-type="' + escapeHtml(bus.busType) + '" ' +
+            'data-route="' + escapeHtml(rId) + '" ' +
+            'onclick="handleEditBus(this)">Edit</button>' +
+            "</td>" +
+            "</tr>"
+          );
+        })
+        .join("");
+    })
+    .catch(function(err) {
+      console.error(err);
     });
-
-    if (!res.ok) throw new Error("Failed to add bus");
-
-    alert("Bus Added Successfully");
-
-    clearBus();
-
-    loadBus();
-
-  } catch (err) {
-
-    alert(`Error: ${err.message}`);
-
-  }
-
+}
+ 
+function handleEditBus(btn) {
+  var d = btn.dataset;
+  editBus(d.id, d.number, d.name, d.type, d.route);
 }
  
 function editBus(id, number, name, type, route) {
-
   setVal("busId", id);
-
   setVal("busNumber", number);
-
   setVal("busName", name);
-
   setVal("busType", type);
-
   setVal("routeId", route);
-
 }
  
-async function updateBus() {
-
-  const bus = {
-
+function loadRouteDropdownForBus() {
+  fetch(API + "/route")
+    .then(function(res) { return res.json(); })
+    .then(function(data) {
+      populateDropdown("routeId", data, "routeId", "routeName", "-- Select Route --");
+    })
+    .catch(function(err) {
+      console.error(err);
+    });
+}
+ 
+function addBus() {
+  var bus = {
     busId: getVal("busId"),
-
     busNumber: getVal("busNumber"),
-
     busName: getVal("busName"),
-
     busType: getVal("busType"),
-
     routeId: getVal("routeId")
-
   };
  
-  try {
-
-    const res = await fetch(`${API}/bus`, {
-
-      method: "PUT",
-
-      headers: { "Content-Type": "application/json" },
-
-      body: JSON.stringify(bus)
-
+  fetch(API + "/bus", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(bus)
+  })
+    .then(function(res) {
+      if (!res.ok) throw new Error("Failed to add bus");
+      alert("Bus Added Successfully");
+      clearBus();
+      loadBus();
+    })
+    .catch(function(err) {
+      alert("Error: " + err.message);
     });
-
-    if (!res.ok) throw new Error("Failed to update bus");
- 
-    alert("Bus Updated Successfully");
-
-    clearBus();
-
-    loadBus();
-
-  } catch (err) {
-
-    alert(`Error: ${err.message}`);
-
-  }
-
 }
  
-async function deleteBus() {
-
-  const id = getVal("busId");
-
+function updateBus() {
+  var bus = {
+    busId: getVal("busId"),
+    busNumber: getVal("busNumber"),
+    busName: getVal("busName"),
+    busType: getVal("busType"),
+    routeId: getVal("routeId")
+  };
+ 
+  fetch(API + "/bus", {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(bus)
+  })
+    .then(function(res) {
+      if (!res.ok) throw new Error("Failed to update bus");
+      alert("Bus Updated Successfully");
+      clearBus();
+      loadBus();
+    })
+    .catch(function(err) {
+      alert("Error: " + err.message);
+    });
+}
+ 
+function deleteBus() {
+  var id = getVal("busId");
   if (!id) return alert("Please specify a Bus ID to delete.");
  
-  try {
-
-    const res = await fetch(`${API}/bus/${id}`, { method: "DELETE" });
-
-    if (!res.ok) throw new Error("Failed to delete bus");
- 
-    alert("Bus Deleted Successfully");
-
-    clearBus();
-
-    loadBus();
-
-  } catch (err) {
-
-    alert(`Error: ${err.message}`);
-
-  }
-
+  fetch(API + "/bus/" + id, { method: "DELETE" })
+    .then(function(res) {
+      if (!res.ok) throw new Error("Failed to delete bus");
+      alert("Bus Deleted Successfully");
+      clearBus();
+      loadBus();
+    })
+    .catch(function(err) {
+      alert("Error: " + err.message);
+    });
 }
  
 function clearBus() {
-
   setVal("busId", "");
-
   setVal("busNumber", "");
-
   setVal("busName", "");
-
-  const busType = document.getElementById("busType");
-
+ 
+  var busType = document.getElementById("busType");
   if (busType) busType.selectedIndex = 0;
  
-  const routeId = document.getElementById("routeId");
-
+  var routeId = document.getElementById("routeId");
   if (routeId) routeId.selectedIndex = 0;
-
 }
  
 /* ===========================
-
    STOP CRUD
-
 =========================== */
  
-async function loadStop() {
-
-  try {
-
-    const res = await fetch(`${API}/stop`);
-
-    const data = await res.json();
+function loadStop() {
+  fetch(API + "/stop")
+    .then(function(res) { return res.json(); })
+    .then(function(data) {
+      var body = document.getElementById("stopTableBody");
+      if (!body) return;
  
-    const body = document.getElementById("stopTableBody");
-
-    if (!body) return;
- 
-    body.innerHTML = data
-
-      .map(
-
-        (stop) => `
-<tr>
-<td>${stop.stopId}</td>
-<td>${stop.stopName}</td>
-<td>
-<button class="btnUpdate" onclick="editStop('${stop.stopId}', '${stop.stopName}')">Edit</button>
-</td>
-</tr>
-
-      `
-
-      )
-
-      .join("");
-
-  } catch (err) {
-
-    console.error(err);
-
-  }
-
+      body.innerHTML = data
+        .map(function(stop) {
+          return (
+            "<tr>" +
+            "<td>" + escapeHtml(stop.stopId) + "</td>" +
+            "<td>" + escapeHtml(stop.stopName) + "</td>" +
+            "<td>" +
+            '<button class="btnUpdate" ' +
+            'data-id="' + escapeHtml(stop.stopId) + '" ' +
+            'data-name="' + escapeHtml(stop.stopName) + '" ' +
+            'onclick="editStop(this.dataset.id, this.dataset.name)">Edit</button>' +
+            "</td>" +
+            "</tr>"
+          );
+        })
+        .join("");
+    })
+    .catch(function(err) {
+      console.error(err);
+    });
 }
  
-async function addStop() {
-
-  const stop = {
-
+function addStop() {
+  var stop = {
     stopId: getVal("stopId"),
-
     stopName: getVal("stopName")
-
   };
  
-  try {
-
-    const res = await fetch(`${API}/stop`, {
-
-      method: "POST",
-
-      headers: { "Content-Type": "application/json" },
-
-      body: JSON.stringify(stop)
-
+  fetch(API + "/stop", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(stop)
+  })
+    .then(function(res) {
+      if (!res.ok) throw new Error("Failed to add stop");
+      alert("Stop Added Successfully");
+      clearStop();
+      loadStop();
+    })
+    .catch(function(err) {
+      alert("Error: " + err.message);
     });
-
-    if (!res.ok) throw new Error("Failed to add stop");
- 
-    alert("Stop Added Successfully");
-
-    clearStop();
-
-    loadStop();
-
-  } catch (err) {
-
-    alert(`Error: ${err.message}`);
-
-  }
-
 }
  
 function editStop(id, name) {
-
   setVal("stopId", id);
-
   setVal("stopName", name);
-
 }
  
-async function updateStop() {
-
-  const stop = {
-
+function updateStop() {
+  var stop = {
     stopId: getVal("stopId"),
-
     stopName: getVal("stopName")
-
   };
  
-  try {
-
-    const res = await fetch(`${API}/stop`, {
-
-      method: "PUT",
-
-      headers: { "Content-Type": "application/json" },
-
-      body: JSON.stringify(stop)
-
+  fetch(API + "/stop", {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(stop)
+  })
+    .then(function(res) {
+      if (!res.ok) throw new Error("Failed to update stop");
+      alert("Stop Updated Successfully");
+      clearStop();
+      loadStop();
+    })
+    .catch(function(err) {
+      alert("Error: " + err.message);
     });
-
-    if (!res.ok) throw new Error("Failed to update stop");
- 
-    alert("Stop Updated Successfully");
-
-    clearStop();
-
-    loadStop();
-
-  } catch (err) {
-
-    alert(`Error: ${err.message}`);
-
-  }
-
 }
- 
-async function deleteStop() {
-
-  const id = getVal("stopId");
-
+[3:58 PM] Madhumitha M
+function deleteStop() {
+  var id = getVal("stopId");
   if (!id) return alert("Please specify a Stop ID to delete.");
  
-  try {
-
-    const res = await fetch(`${API}/stop/${id}`, { method: "DELETE" });
-
-    if (!res.ok) throw new Error("Failed to delete stop");
- 
-    alert("Stop Deleted Successfully");
-
-    clearStop();
-
-    loadStop();
-
-  } catch (err) {
-
-    alert(`Error: ${err.message}`);
-
-  }
-
+  fetch(API + "/stop/" + id, { method: "DELETE" })
+    .then(function(res) {
+      if (!res.ok) throw new Error("Failed to delete stop");
+      alert("Stop Deleted Successfully");
+      clearStop();
+      loadStop();
+    })
+    .catch(function(err) {
+      alert("Error: " + err.message);
+    });
 }
  
 function clearStop() {
-
   setVal("stopId", "");
-
   setVal("stopName", "");
-
 }
  
 /* ===========================
-
    ROUTE CRUD
-
 =========================== */
-async function loadRoute() {
-
-    try {
-
-        const res = await fetch(`${API}/route`);
-
-        if (!res.ok) throw new Error("Failed to load routes");
-
-        const data = await res.json();
-
-        const body = document.getElementById("routeTableBody");
-
-        body.innerHTML = "";
-
-        data.forEach(route => {
-
-            let stops = "";
-
-            if (route.routeStops) {
-
-                stops = route.routeStops
-                    .sort((a, b) => a.stopOrder - b.stopOrder)
-                    .map(s => `${s.stopName} (${s.distanceFromPrevious} km)`)
-                    .join(" ➜ ");
-
-            }
-
-            body.innerHTML += `
-<tr>
-
-<td>${route.routeId}</td>
-
-<td>${route.routeName}</td>
-
-<td>${route.distance}</td>
-
-<td>${stops}</td>
-
-<td>
-
-<button class="btnUpdate"
-onclick="editRoute('${route.routeId}')">
-
-Edit
-
-</button>
-
-</td>
-
-</tr>
-`;
-
-        });
-
-    } catch (err) {
-
-        console.error(err);
-
-    }
-
+ 
+function loadRoute() {
+  fetch(API + "/route")
+    .then(function(res) {
+      if (!res.ok) throw new Error("Failed to load routes");
+      return res.json();
+    })
+    .then(function(data) {
+      var body = document.getElementById("routeTableBody");
+      if (!body) return;
+ 
+      body.innerHTML = data
+        .map(function(route) {
+          var stops = "";
+          if (route.routeStops) {
+            stops = route.routeStops
+              .sort(function(a, b) { return a.stopOrder - b.stopOrder; })
+              .map(function(s) {
+                return escapeHtml(s.stopName) + " (" + s.distanceFromPrevious + " km)";
+              })
+              .join(" ➜ ");
+          }
+ 
+          return (
+            "<tr>" +
+            "<td>" + escapeHtml(route.routeId) + "</td>" +
+            "<td>" + escapeHtml(route.routeName) + "</td>" +
+            "<td>" + route.distance + "</td>" +
+            "<td>" + stops + "</td>" +
+            "<td>" +
+            '<button class="btnUpdate" ' +
+            'data-id="' + escapeHtml(route.routeId) + '" ' +
+            'onclick="editRoute(this.dataset.id)">Edit</button>' +
+            "</td>" +
+            "</tr>"
+          );
+        })
+        .join("");
+    })
+    .catch(function(err) {
+      console.error(err);
+    });
 }
-async function loadStopsForRoute() {
-
-    try {
-
-        const res = await fetch(`${API}/stop`);
-        const data = await res.json();
-
-        const tbody = document.getElementById("routeStopsBody");
-
-        if (!tbody) return;
-
-        tbody.innerHTML = data.map((stop, index) => `
-
-        <tr>
-
-            <td>
-                <input type="checkbox"
-                       value="${stop.stopId}"
-                       data-name="${stop.stopName}">
-            </td>
-
-            <td>${stop.stopName}</td>
-
-            <td>
-                <input type="number"
-                       class="stopOrder"
-                       value="${index + 1}"
-                       min="1">
-            </td>
-
-            <td>
-                <input type="number"
-                       class="distancePrev"
-                       value="${index == 0 ? 0 : ''}"
-                       min="0">
-            </td>
-
-        </tr>
-
-        `).join("");
-
-    } catch (err) {
-
-        console.error(err);
-
-    }
-
+ 
+function loadStopsForRoute() {
+  fetch(API + "/stop")
+    .then(function(res) { return res.json(); })
+    .then(function(data) {
+      var tbody = document.getElementById("routeStopsBody");
+      if (!tbody) return;
+ 
+      tbody.innerHTML = data
+        .map(function(stop, index) {
+          return (
+            "<tr>" +
+            '<td><input type="checkbox" value="' + escapeHtml(stop.stopId) + '" data-name="' + escapeHtml(stop.stopName) + '"></td>' +
+            "<td>" + escapeHtml(stop.stopName) + "</td>" +
+            '<td><input type="number" class="stopOrder" value="' + (index + 1) + '" min="1"></td>' +
+            '<td><input type="number" class="distancePrev" value="' + (index === 0 ? 0 : "") + '" min="0"></td>' +
+            "</tr>"
+          );
+        })
+        .join("");
+    })
+    .catch(function(err) {
+      console.error(err);
+    });
 }
+ 
 function getRouteStops() {
-
-    const rows = document.querySelectorAll("#routeStopsBody tr");
-
-    const routeStops = [];
-
-    rows.forEach((row) => {
-
-        const checkBox = row.querySelector("input[type='checkbox']");
-
-        if (checkBox.checked) {
-
-            routeStops.push({
-
-                stopId: checkBox.value,
-
-                stopName: checkBox.dataset.name,
-
-                stopOrder: parseInt(
-                    row.querySelector(".stopOrder").value
-                ),
-
-                distanceFromPrevious: parseFloat(
-                    row.querySelector(".distancePrev").value || 0
-                )
-
-            });
-
-        }
-
-    });
-
-    return routeStops;
-
-}
-async function addRoute() {
-
-    const route = {
-
-        routeId: getVal("routeInputId"),
-
-        routeName: getVal("routeName"),
-
-        distance: parseFloat(getVal("distance")),
-
-        routeStops: getRouteStops()
-
-    };
-
-    try {
-
-        const res = await fetch(`${API}/route`, {
-
-            method: "POST",
-
-            headers: {
-
-                "Content-Type": "application/json"
-
-            },
-
-            body: JSON.stringify(route)
-
-        });
-
-        if (!res.ok) {
-
-            throw new Error("Failed to add route");
-
-        }
-
-        alert("Route Added Successfully");
-
-        clearRoute();
-
-        loadRoute();
-
+  var rows = document.querySelectorAll("#routeStopsBody tr");
+  var routeStops = [];
+ 
+  for (var i = 0; i < rows.length; i++) {
+    var row = rows[i];
+    var checkBox = row.querySelector("input[type='checkbox']");
+    if (checkBox && checkBox.checked) {
+      var orderEl = row.querySelector(".stopOrder");
+      var distEl = row.querySelector(".distancePrev");
+ 
+      routeStops.push({
+        stopId: checkBox.value,
+        stopName: checkBox.dataset.name,
+        stopOrder: parseInt(orderEl ? orderEl.value : 0, 10),
+        distanceFromPrevious: parseFloat(distEl ? (distEl.value || 0) : 0)
+      });
     }
-
-    catch (err) {
-
-        alert(err.message);
-
-    }
-
-}
-async function editRoute(routeId) {
-
-    try {
-
-        const res = await fetch(`${API}/route/${routeId}`);
-
-        if (!res.ok) throw new Error("Route not found");
-
-        const route = await res.json();
-
-        setVal("routeInputId", route.routeId);
-        setVal("routeName", route.routeName);
-        setVal("distance", route.distance);
-
-        document.querySelectorAll("#routeStopsBody tr").forEach(row => {
-
-            row.querySelector("input[type='checkbox']").checked = false;
-
-            row.querySelector(".stopOrder").value = "";
-
-            row.querySelector(".distancePrev").value = "";
-
-        });
-
-        if (route.routeStops) {
-
-            route.routeStops.forEach(stop => {
-
-                document.querySelectorAll("#routeStopsBody tr").forEach(row => {
-
-                    const chk = row.querySelector("input[type='checkbox']");
-
-                    if (chk.value === stop.stopId) {
-
-                        chk.checked = true;
-
-                        row.querySelector(".stopOrder").value = stop.stopOrder;
-
-                        row.querySelector(".distancePrev").value =
-                            stop.distanceFromPrevious;
-
-                    }
-
-                });
-
-            });
-
-        }
-
-    } catch (err) {
-
-        alert(err.message);
-
-    }
-
-}
-async function updateRoute() {
-
-    const route = {
-
-        routeId: getVal("routeInputId"),
-
-        routeName: getVal("routeName"),
-
-        distance: parseFloat(getVal("distance")),
-
-        routeStops: getRouteStops()
-
-    };
-
-    try {
-
-        const res = await fetch(`${API}/route`, {
-
-            method: "PUT",
-
-            headers: {
-
-                "Content-Type": "application/json"
-
-            },
-
-            body: JSON.stringify(route)
-
-        });
-
-        if (!res.ok)
-            throw new Error("Failed to update route");
-
-        alert("Route Updated Successfully");
-
-        clearRoute();
-
-        loadRoute();
-
-    } catch (err) {
-
-        alert(err.message);
-
-    }
-
-}
- 
-async function deleteRoute() {
-
-  const id = getVal("routeInputId");
-
-  if (!id) return alert("Please specify a Route ID to delete.");
- 
-  try {
-
-    const res = await fetch(`${API}/route/${id}`, { method: "DELETE" });
-
-    if (!res.ok) throw new Error("Failed to delete route");
- 
-    alert("Route Deleted Successfully");
-
-    clearRoute();
-
-    loadRoute();
-
-  } catch (err) {
-
-    alert(`Error: ${err.message}`);
-
   }
-
-}
-function clearRoute() {
-
-    setVal("routeInputId", "");
-
-    setVal("routeName", "");
-
-    setVal("distance", "");
-
-    document.querySelectorAll("#routeStopsBody tr").forEach(row => {
-
-        row.querySelector("input[type='checkbox']").checked = false;
-
-        row.querySelector(".stopOrder").value = "";
-
-        row.querySelector(".distancePrev").value = "";
-
-    });
-
+ 
+  return routeStops;
 }
  
-/* ===========================
-
-   SCHEDULE CRUD
-
-=========================== */
- 
-async function loadSchedule() {
-
-  try {
-
-    const res = await fetch(`${API}/schedule`);
-
-    const data = await res.json();
- 
-    const body = document.getElementById("scheduleTableBody");
-
-    if (!body) return;
- 
-    body.innerHTML = data
-
-      .map((schedule) => {
-
-        const rawDays = schedule.operatingDays || schedule.day;
-
-        const dayVal = Array.isArray(rawDays) ? rawDays.join(", ") : rawDays || "";
- 
-        return `
-<tr>
-<td>${schedule.scheduleId}</td>
-<td>${schedule.busId}</td>
-<td>${schedule.routeId}</td>
-<td>${schedule.departureTime}</td>
-<td>${schedule.arrivalTime}</td>
-<td>${dayVal}</td>
-<td>
-<button class="btnUpdate" onclick="editSchedule('${schedule.scheduleId}', '${schedule.busId}', '${schedule.routeId}', '${schedule.departureTime}', '${schedule.arrivalTime}', '${dayVal}')">Edit</button>
-</td>
-</tr>
-
-        `;
-
-      })
-
-      .join("");
-
-  } catch (err) {
-
-    console.error(err);
-
-  }
-
-}
- 
-async function loadBusDropdown() {
-
-  try {
-
-    const res = await fetch(`${API}/bus`);
-
-    const data = await res.json();
-
-    populateDropdown("scheduleBusId", data, "busId", (b) => `${b.busNumber} (${b.busName})`, "-- Select Bus --");
-
-  } catch (err) {
-
-    console.error(err);
-
-  }
-
-}
- 
-async function loadRouteDropdown() {
-
-  try {
-
-    const res = await fetch(`${API}/route`);
-
-    const data = await res.json();
-
-    populateDropdown("scheduleRouteId", data, "routeId", "routeName", "-- Select Route --");
-
-  } catch (err) {
-
-    console.error(err);
-
-  }
-
-}
- 
-const formatTime = (timeStr) => (timeStr.length === 5 ? `${timeStr}:00` : timeStr);
- 
-async function addSchedule() {
-
-  const daySelected = getVal("day");
- 
-  const schedule = {
-
-    scheduleId: getVal("scheduleId"),
-
-    busId: getVal("scheduleBusId"),
-
-    routeId: getVal("scheduleRouteId"),
-
-    departureTime: formatTime(getVal("departureTime")),
-
-    arrivalTime: formatTime(getVal("arrivalTime")),
-
-    operatingDays: daySelected ? [daySelected] : []
-
+function addRoute() {
+  var route = {
+    routeId: getVal("routeInputId"),
+    routeName: getVal("routeName"),
+    distance: parseFloat(getVal("distance")) || 0,
+    routeStops: getRouteStops()
   };
  
-  try {
-
-    const res = await fetch(`${API}/schedule`, {
-
-      method: "POST",
-
-      headers: { "Content-Type": "application/json" },
-
-      body: JSON.stringify(schedule)
-
+  fetch(API + "/route", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(route)
+  })
+    .then(function(res) {
+      if (!res.ok) throw new Error("Failed to add route");
+      alert("Route Added Successfully");
+      clearRoute();
+      loadRoute();
+    })
+    .catch(function(err) {
+      alert(err.message);
     });
+}
  
-    if (!res.ok) {
-
-      const errorText = await res.text();
-
-      throw new Error(errorText || "Failed to add schedule");
-
-    }
+function editRoute(routeId) {
+  fetch(API + "/route/" + routeId)
+    .then(function(res) {
+      if (!res.ok) throw new Error("Route not found");
+      return res.json();
+    })
+    .then(function(route) {
+      setVal("routeInputId", route.routeId);
+      setVal("routeName", route.routeName);
+      setVal("distance", route.distance);
  
-    alert("Schedule Added Successfully");
-
-    clearSchedule();
-
-    loadSchedule();
-
-  } catch (err) {
-
-    alert(`Error: ${err.message}`);
-
+      var rows = document.querySelectorAll("#routeStopsBody tr");
+      for (var i = 0; i < rows.length; i++) {
+        var row = rows[i];
+        var chk = row.querySelector("input[type='checkbox']");
+        if (chk) chk.checked = false;
+        var order = row.querySelector(".stopOrder");
+        if (order) order.value = "";
+        var dist = row.querySelector(".distancePrev");
+        if (dist) dist.value = "";
+      }
+ 
+      if (route.routeStops) {
+        route.routeStops.forEach(function(stop) {
+          for (var j = 0; j < rows.length; j++) {
+            var r = rows[j];
+            var c = r.querySelector("input[type='checkbox']");
+            if (c && c.value === stop.stopId) {
+              c.checked = true;
+              var o = r.querySelector(".stopOrder");
+              if (o) o.value = stop.stopOrder;
+              var d = r.querySelector(".distancePrev");
+              if (d) d.value = stop.distanceFromPrevious;
+            }
+          }
+        });
+      }
+    })
+    .catch(function(err) {
+      alert(err.message);
+    });
+}
+ 
+function updateRoute() {
+  var route = {
+    routeId: getVal("routeInputId"),
+    routeName: getVal("routeName"),
+    distance: parseFloat(getVal("distance")) || 0,
+    routeStops: getRouteStops()
+  };
+ 
+  fetch(API + "/route", {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(route)
+  })
+    .then(function(res) {
+      if (!res.ok) throw new Error("Failed to update route");
+      alert("Route Updated Successfully");
+      clearRoute();
+      loadRoute();
+    })
+    .catch(function(err) {
+      alert(err.message);
+    });
+}
+ 
+function deleteRoute() {
+  var id = getVal("routeInputId");
+  if (!id) return alert("Please specify a Route ID to delete.");
+ 
+  fetch(API + "/route/" + id, { method: "DELETE" })
+    .then(function(res) {
+      if (!res.ok) throw new Error("Failed to delete route");
+      alert("Route Deleted Successfully");
+      clearRoute();
+      loadRoute();
+    })
+    .catch(function(err) {
+      alert("Error: " + err.message);
+    });
+}
+ 
+function clearRoute() {
+  setVal("routeInputId", "");
+  setVal("routeName", "");
+  setVal("distance", "");
+ 
+  var rows = document.querySelectorAll("#routeStopsBody tr");
+  for (var i = 0; i < rows.length; i++) {
+    var row = rows[i];
+    var chk = row.querySelector("input[type='checkbox']");
+    if (chk) chk.checked = false;
+    var order = row.querySelector(".stopOrder");
+    if (order) order.value = "";
+    var dist = row.querySelector(".distancePrev");
+    if (dist) dist.value = "";
   }
-
+}
+ [3:58 PM] Madhumitha M
+ 
+/* ===========================
+   SCHEDULE CRUD
+=========================== */
+ 
+function loadSchedule() {
+  fetch(API + "/schedule")
+    .then(function(res) { return res.json(); })
+    .then(function(data) {
+      var body = document.getElementById("scheduleTableBody");
+      if (!body) return;
+ 
+      body.innerHTML = data
+        .map(function(schedule) {
+          var rawDays = schedule.operatingDays || schedule.day;
+          var dayVal = Array.isArray(rawDays) ? rawDays.join(", ") : (rawDays || "");
+ 
+          return (
+            "<tr>" +
+            "<td>" + escapeHtml(schedule.scheduleId) + "</td>" +
+            "<td>" + escapeHtml(schedule.busId) + "</td>" +
+            "<td>" + escapeHtml(schedule.routeId) + "</td>" +
+            "<td>" + escapeHtml(schedule.departureTime) + "</td>" +
+            "<td>" + escapeHtml(schedule.arrivalTime) + "</td>" +
+            "<td>" + escapeHtml(dayVal) + "</td>" +
+            "<td>" +
+            '<button class="btnUpdate" ' +
+            'data-id="' + escapeHtml(schedule.scheduleId) + '" ' +
+            'data-bus="' + escapeHtml(schedule.busId) + '" ' +
+            'data-route="' + escapeHtml(schedule.routeId) + '" ' +
+            'data-dep="' + escapeHtml(schedule.departureTime) + '" ' +
+            'data-arr="' + escapeHtml(schedule.arrivalTime) + '" ' +
+            'data-day="' + escapeHtml(dayVal) + '" ' +
+            'onclick="handleEditSchedule(this)">Edit</button>' +
+            "</td>" +
+            "</tr>"
+          );
+        })
+        .join("");
+    })
+    .catch(function(err) {
+      console.error(err);
+    });
+}
+ 
+function handleEditSchedule(btn) {
+  var d = btn.dataset;
+  editSchedule(d.id, d.bus, d.route, d.dep, d.arr, d.day);
+}
+ 
+function loadBusDropdown() {
+  fetch(API + "/bus")
+    .then(function(res) { return res.json(); })
+    .then(function(data) {
+      populateDropdown(
+        "scheduleBusId",
+        data,
+        "busId",
+        function(b) { return b.busNumber + " (" + b.busName + ")"; },
+        "-- Select Bus --"
+      );
+    })
+    .catch(function(err) {
+      console.error(err);
+    });
+}
+ 
+function loadRouteDropdown() {
+  fetch(API + "/route")
+    .then(function(res) { return res.json(); })
+    .then(function(data) {
+      populateDropdown("scheduleRouteId", data, "routeId", "routeName", "-- Select Route --");
+    })
+    .catch(function(err) {
+      console.error(err);
+    });
+}
+ 
+function formatTime(timeStr) {
+  return (timeStr && timeStr.length === 5) ? timeStr + ":00" : (timeStr || "");
+}
+ 
+function addSchedule() {
+  var daySelected = getVal("day");
+ 
+  var schedule = {
+    scheduleId: getVal("scheduleId"),
+    busId: getVal("scheduleBusId"),
+    routeId: getVal("scheduleRouteId"),
+    departureTime: formatTime(getVal("departureTime")),
+    arrivalTime: formatTime(getVal("arrivalTime")),
+    operatingDays: daySelected ? [daySelected] : []
+  };
+ 
+  fetch(API + "/schedule", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(schedule)
+  })
+    .then(function(res) {
+      if (!res.ok) {
+        return res.text().then(function(text) {
+          throw new Error(text || "Failed to add schedule");
+        });
+      }
+      alert("Schedule Added Successfully");
+      clearSchedule();
+      loadSchedule();
+    })
+    .catch(function(err) {
+      alert("Error: " + err.message);
+    });
 }
  
 function editSchedule(id, busId, routeId, departure, arrival, day) {
-
   setVal("scheduleId", id);
-
   setVal("scheduleBusId", busId);
-
   setVal("scheduleRouteId", routeId);
-
   setVal("departureTime", departure);
-
   setVal("arrivalTime", arrival);
-
   setVal("day", day);
-
 }
  
-async function updateSchedule() {
-
-  const daySelected = getVal("day");
+function updateSchedule() {
+  var daySelected = getVal("day");
  
-  const schedule = {
-
+  var schedule = {
     scheduleId: getVal("scheduleId"),
-
     busId: getVal("scheduleBusId"),
-
     routeId: getVal("scheduleRouteId"),
-
     departureTime: formatTime(getVal("departureTime")),
-
     arrivalTime: formatTime(getVal("arrivalTime")),
-
     operatingDays: daySelected ? [daySelected] : []
-
   };
  
-  try {
-
-    const res = await fetch(`${API}/schedule`, {
-
-      method: "PUT",
-
-      headers: { "Content-Type": "application/json" },
-
-      body: JSON.stringify(schedule)
-
+  fetch(API + "/schedule", {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(schedule)
+  })
+    .then(function(res) {
+      if (!res.ok) {
+        return res.text().then(function(text) {
+          throw new Error(text || "Failed to update schedule");
+        });
+      }
+      alert("Schedule Updated Successfully");
+      clearSchedule();
+      loadSchedule();
+    })
+    .catch(function(err) {
+      alert("Error: " + err.message);
     });
- 
-    if (!res.ok) {
-
-      const errorText = await res.text();
-
-      throw new Error(errorText || "Failed to update schedule");
-
-    }
- 
-    alert("Schedule Updated Successfully");
-
-    clearSchedule();
-
-    loadSchedule();
-
-  } catch (err) {
-
-    alert(`Error: ${err.message}`);
-
-  }
-
 }
  
-async function deleteSchedule() {
-
-  const id = getVal("scheduleId");
-
+function deleteSchedule() {
+  var id = getVal("scheduleId");
   if (!id) return alert("Please specify a Schedule ID to delete.");
  
-  try {
-
-    const res = await fetch(`${API}/schedule/${id}`, { method: "DELETE" });
- 
-    if (!res.ok) {
-
-      const errorText = await res.text();
-
-      throw new Error(errorText || "Failed to delete schedule");
-
-    }
- 
-    alert("Schedule Deleted Successfully");
-
-    clearSchedule();
-
-    loadSchedule();
-
-  } catch (err) {
-
-    alert(`Error: ${err.message}`);
-
-  }
-
+  fetch(API + "/schedule/" + id, { method: "DELETE" })
+    .then(function(res) {
+      if (!res.ok) {
+        return res.text().then(function(text) {
+          throw new Error(text || "Failed to delete schedule");
+        });
+      }
+      alert("Schedule Deleted Successfully");
+      clearSchedule();
+      loadSchedule();
+    })
+    .catch(function(err) {
+      alert("Error: " + err.message);
+    });
 }
  
 function clearSchedule() {
-
   setVal("scheduleId", "");
-
   setVal("departureTime", "");
-
   setVal("arrivalTime", "");
  
-  const day = document.getElementById("day");
-
+  var busSelect = document.getElementById("scheduleBusId");
+  if (busSelect) busSelect.selectedIndex = 0;
+ 
+  var routeSelect = document.getElementById("scheduleRouteId");
+  if (routeSelect) routeSelect.selectedIndex = 0;
+ 
+  var day = document.getElementById("day");
   if (day) day.selectedIndex = 0;
-
 }
  
 /* ===========================
-
    INITIAL LOAD
-
 =========================== */
  
-window.addEventListener("DOMContentLoaded", () => {
-
+window.addEventListener("DOMContentLoaded", function() {
   loadBus();
-
   loadRouteDropdownForBus();
-
-  loadStop();
-
-  loadRoute();
-
-  loadStopsForRoute();
-
-  loadSchedule();
-
-  loadBusDropdown();
-
-  loadRouteDropdown();
-
 });
+  
+ 
  
