@@ -6,23 +6,29 @@ public class BusLocation {
     private double latitude;
     private double longitude;
     private double speed;
-    private String currentStopId;
-    private String nextStopId;
+
+    private String currentStop;
+    private String nextStop;
+
     private String lastUpdated;
 
     public BusLocation() {
     }
 
-    public BusLocation(String busId, double latitude, double longitude,
-                       double speed, String currentStopId,
-                       String nextStopId, String lastUpdated) {
+    public BusLocation(String busId,
+                       double latitude,
+                       double longitude,
+                       double speed,
+                       String currentStop,
+                       String nextStop,
+                       String lastUpdated) {
 
         this.busId = busId;
         this.latitude = latitude;
         this.longitude = longitude;
         this.speed = speed;
-        this.currentStopId = currentStopId;
-        this.nextStopId = nextStopId;
+        this.currentStop = currentStop;
+        this.nextStop = nextStop;
         this.lastUpdated = lastUpdated;
     }
 
@@ -58,20 +64,20 @@ public class BusLocation {
         this.speed = speed;
     }
 
-    public String getCurrentStopId() {
-        return currentStopId;
+    public String getCurrentStop() {
+        return currentStop;
     }
 
-    public void setCurrentStopId(String currentStopId) {
-        this.currentStopId = currentStopId;
+    public void setCurrentStop(String currentStop) {
+        this.currentStop = currentStop;
     }
 
-    public String getNextStopId() {
-        return nextStopId;
+    public String getNextStop() {
+        return nextStop;
     }
 
-    public void setNextStopId(String nextStopId) {
-        this.nextStopId = nextStopId;
+    public void setNextStop(String nextStop) {
+        this.nextStop = nextStop;
     }
 
     public String getLastUpdated() {
