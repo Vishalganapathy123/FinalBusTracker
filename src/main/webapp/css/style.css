@@ -352,4 +352,69 @@ table button:hover {
     }
 
 }
+/* ===========================
+   ROUTE STOPS TABLE
+=========================== */
+
+#routeStopsTable {
+
+    width: 100%;
+
+    border-collapse: collapse;
+
+    margin-top: 15px;
+
+}
+
+#routeStopsTable th {
+
+    background: #3498db;
+
+    color: white;
+
+    padding: 10px;
+
+    text-align: center;
+
+}
+
+#routeStopsTable td {
+
+    border: 1px solid #ddd;
+
+    padding: 8px;
+
+    text-align: center;
+
+}
+
+#routeStopsTable input[type="number"] {
+
+    width: 70px;
+
+    padding: 5px;
+
+    text-align: center;
+
+}
+
+#routeStopsTable input[type="checkbox"] {
+
+    transform: scale(1.2);
+
+    cursor: pointer;
+
+}
+
+#routeStopsTable tr:nth-child(even) {
+
+    background: #f8f9fa;
+
+}
+
+#routeStopsTable tr:hover {
+
+    background: #ecf0f1;
+
+}
  

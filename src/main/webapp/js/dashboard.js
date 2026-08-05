@@ -495,170 +495,301 @@ function clearStop() {
    ROUTE CRUD
 
 =========================== */
- 
 async function loadRoute() {
 
-  try {
+    try {
 
-    const res = await fetch(`${API}/route`);
+        const res = await fetch(`${API}/route`);
 
-    const data = await res.json();
- 
-    const body = document.getElementById("routeTableBody");
+        if (!res.ok) throw new Error("Failed to load routes");
 
-    if (!body) return;
- 
-    body.innerHTML = data
+        const data = await res.json();
 
-      .map((route) => {
+        const body = document.getElementById("routeTableBody");
 
-        const stops = Array.isArray(route.stopIds) ? route.stopIds.join(", ") : "";
+        body.innerHTML = "";
 
-        return `
+        data.forEach(route => {
+
+            let stops = "";
+
+            if (route.routeStops) {
+
+                stops = route.routeStops
+                    .sort((a, b) => a.stopOrder - b.stopOrder)
+                    .map(s => `${s.stopName} (${s.distanceFromPrevious} km)`)
+                    .join(" ➜ ");
+
+            }
+
+            body.innerHTML += `
 <tr>
+
 <td>${route.routeId}</td>
+
 <td>${route.routeName}</td>
+
+<td>${route.distance}</td>
+
 <td>${stops}</td>
+
 <td>
-<button class="btnUpdate" onclick="editRoute('${route.routeId}', '${route.routeName}')">Edit</button>
+
+<button class="btnUpdate"
+onclick="editRoute('${route.routeId}')">
+
+Edit
+
+</button>
+
 </td>
+
 </tr>
+`;
 
-        `;
+        });
 
-      })
+    } catch (err) {
 
-      .join("");
+        console.error(err);
 
-  } catch (err) {
-
-    console.error(err);
-
-  }
+    }
 
 }
- 
 async function loadStopsForRoute() {
 
-  try {
+    try {
 
-    const res = await fetch(`${API}/stop`);
+        const res = await fetch(`${API}/stop`);
+        const data = await res.json();
 
-    const data = await res.json();
- 
-    const select = document.getElementById("routeStops");
+        const tbody = document.getElementById("routeStopsBody");
 
-    if (!select) return;
- 
-    select.innerHTML = data
+        if (!tbody) return;
 
-      .map((stop) => `<option value="${stop.stopId}">${stop.stopName}</option>`)
+        tbody.innerHTML = data.map((stop, index) => `
 
-      .join("");
+        <tr>
 
-  } catch (err) {
+            <td>
+                <input type="checkbox"
+                       value="${stop.stopId}"
+                       data-name="${stop.stopName}">
+            </td>
 
-    console.error(err);
+            <td>${stop.stopName}</td>
 
-  }
+            <td>
+                <input type="number"
+                       class="stopOrder"
+                       value="${index + 1}"
+                       min="1">
+            </td>
+
+            <td>
+                <input type="number"
+                       class="distancePrev"
+                       value="${index == 0 ? 0 : ''}"
+                       min="0">
+            </td>
+
+        </tr>
+
+        `).join("");
+
+    } catch (err) {
+
+        console.error(err);
+
+    }
 
 }
- 
-const getSelectedStops = () => {
+function getRouteStops() {
 
-  const stopsSelect = document.getElementById("routeStops");
+    const rows = document.querySelectorAll("#routeStopsBody tr");
 
-  if (!stopsSelect) return [];
+    const routeStops = [];
 
-  return Array.from(stopsSelect.selectedOptions).map((opt) => opt.value);
+    rows.forEach((row) => {
 
-};
- 
+        const checkBox = row.querySelector("input[type='checkbox']");
+
+        if (checkBox.checked) {
+
+            routeStops.push({
+
+                stopId: checkBox.value,
+
+                stopName: checkBox.dataset.name,
+
+                stopOrder: parseInt(
+                    row.querySelector(".stopOrder").value
+                ),
+
+                distanceFromPrevious: parseFloat(
+                    row.querySelector(".distancePrev").value || 0
+                )
+
+            });
+
+        }
+
+    });
+
+    return routeStops;
+
+}
 async function addRoute() {
 
-  const route = {
+    const route = {
 
-    routeId: getVal("routeInputId"),
+        routeId: getVal("routeInputId"),
 
-    routeName: getVal("routeName"),
+        routeName: getVal("routeName"),
 
-    stopIds: getSelectedStops()
+        distance: parseFloat(getVal("distance")),
 
-  };
- 
-  try {
+        routeStops: getRouteStops()
 
-    const res = await fetch(`${API}/route`, {
+    };
 
-      method: "POST",
+    try {
 
-      headers: { "Content-Type": "application/json" },
+        const res = await fetch(`${API}/route`, {
 
-      body: JSON.stringify(route)
+            method: "POST",
 
-    });
+            headers: {
 
-    if (!res.ok) throw new Error("Failed to add route");
- 
-    alert("Route Added Successfully");
+                "Content-Type": "application/json"
 
-    clearRoute();
+            },
 
-    loadRoute();
+            body: JSON.stringify(route)
 
-  } catch (err) {
+        });
 
-    alert(`Error: ${err.message}`);
+        if (!res.ok) {
 
-  }
+            throw new Error("Failed to add route");
+
+        }
+
+        alert("Route Added Successfully");
+
+        clearRoute();
+
+        loadRoute();
+
+    }
+
+    catch (err) {
+
+        alert(err.message);
+
+    }
 
 }
- 
-function editRoute(id, name) {
+async function editRoute(routeId) {
 
-  setVal("routeInputId", id);
+    try {
 
-  setVal("routeName", name);
+        const res = await fetch(`${API}/route/${routeId}`);
+
+        if (!res.ok) throw new Error("Route not found");
+
+        const route = await res.json();
+
+        setVal("routeInputId", route.routeId);
+        setVal("routeName", route.routeName);
+        setVal("distance", route.distance);
+
+        document.querySelectorAll("#routeStopsBody tr").forEach(row => {
+
+            row.querySelector("input[type='checkbox']").checked = false;
+
+            row.querySelector(".stopOrder").value = "";
+
+            row.querySelector(".distancePrev").value = "";
+
+        });
+
+        if (route.routeStops) {
+
+            route.routeStops.forEach(stop => {
+
+                document.querySelectorAll("#routeStopsBody tr").forEach(row => {
+
+                    const chk = row.querySelector("input[type='checkbox']");
+
+                    if (chk.value === stop.stopId) {
+
+                        chk.checked = true;
+
+                        row.querySelector(".stopOrder").value = stop.stopOrder;
+
+                        row.querySelector(".distancePrev").value =
+                            stop.distanceFromPrevious;
+
+                    }
+
+                });
+
+            });
+
+        }
+
+    } catch (err) {
+
+        alert(err.message);
+
+    }
 
 }
- 
 async function updateRoute() {
 
-  const route = {
+    const route = {
 
-    routeId: getVal("routeInputId"),
+        routeId: getVal("routeInputId"),
 
-    routeName: getVal("routeName"),
+        routeName: getVal("routeName"),
 
-    stopIds: getSelectedStops()
+        distance: parseFloat(getVal("distance")),
 
-  };
- 
-  try {
+        routeStops: getRouteStops()
 
-    const res = await fetch(`${API}/route`, {
+    };
 
-      method: "PUT",
+    try {
 
-      headers: { "Content-Type": "application/json" },
+        const res = await fetch(`${API}/route`, {
 
-      body: JSON.stringify(route)
+            method: "PUT",
 
-    });
+            headers: {
 
-    if (!res.ok) throw new Error("Failed to update route");
- 
-    alert("Route Updated Successfully");
+                "Content-Type": "application/json"
 
-    clearRoute();
+            },
 
-    loadRoute();
+            body: JSON.stringify(route)
 
-  } catch (err) {
+        });
 
-    alert(`Error: ${err.message}`);
+        if (!res.ok)
+            throw new Error("Failed to update route");
 
-  }
+        alert("Route Updated Successfully");
+
+        clearRoute();
+
+        loadRoute();
+
+    } catch (err) {
+
+        alert(err.message);
+
+    }
 
 }
  
@@ -687,16 +818,23 @@ async function deleteRoute() {
   }
 
 }
- 
 function clearRoute() {
 
-  setVal("routeInputId", "");
+    setVal("routeInputId", "");
 
-  setVal("routeName", "");
+    setVal("routeName", "");
 
-  const stopsSelect = document.getElementById("routeStops");
+    setVal("distance", "");
 
-  if (stopsSelect) stopsSelect.selectedIndex = -1;
+    document.querySelectorAll("#routeStopsBody tr").forEach(row => {
+
+        row.querySelector("input[type='checkbox']").checked = false;
+
+        row.querySelector(".stopOrder").value = "";
+
+        row.querySelector(".distancePrev").value = "";
+
+    });
 
 }
  

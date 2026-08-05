@@ -215,90 +215,109 @@
  
     </div>
  
-    <!-- ================= ROUTE ================= -->
- 
-    <div id="route" class="tabContent" style="display:none;">
- 
-        <div class="card">
- 
-            <h2>Manage Route</h2>
- 
-            <div class="formGrid">
- 
-                <div class="formGroup">
- 
-                    <label>Route ID</label>
- 
-                    <input type="text" id="routeInputId">
- 
-                </div>
- 
-                <div class="formGroup">
- 
-                    <label>Route Name</label>
- 
-                    <input type="text" id="routeName">
- 
-                </div>
- 
-                <div class="formGroup">
- 
-                    <label>Distance (km)</label>
- 
-                    <input type="number" id="distance" step="0.1" min="0" placeholder="e.g. 15.5">
- 
-                </div>
- 
-                <div class="formGroup">
- 
-                    <label>Select Stops</label>
- 
-                    <select id="routeStops" multiple size="6"></select>
- 
-                </div>
- 
+   <!-- ================= ROUTE ================= -->
+
+<div id="route" class="tabContent" style="display:none;">
+
+    <div class="card">
+
+        <h2>Manage Route</h2>
+
+        <div class="formGrid">
+
+            <div class="formGroup">
+
+                <label>Route ID</label>
+
+                <input type="text" id="routeInputId">
+
             </div>
- 
-            <br>
- 
-            <button class="btnAdd" onclick="addRoute()">Add Route</button>
- 
-            <button class="btnUpdate" onclick="updateRoute()">Update Route</button>
- 
-            <button class="btnDelete" onclick="deleteRoute()">Delete Route</button>
- 
-            <button class="btnClear" onclick="clearRoute()">Clear</button>
- 
+
+            <div class="formGroup">
+
+                <label>Route Name</label>
+
+                <input type="text" id="routeName">
+
+            </div>
+
+            <div class="formGroup">
+
+                <label>Total Distance (km)</label>
+
+                <input type="number"
+                       id="distance"
+                       step="0.1"
+                       min="0">
+
+            </div>
+
         </div>
- 
-        <div class="card">
- 
-            <h2>Route List</h2>
- 
-            <table>
- 
-                <thead>
- 
-                    <tr>
- 
-                        <th>Route ID</th>
-<th>Route Name</th>
-<th>Distance (km)</th>
-<th>Stops</th>
-<th>Action</th>
- 
-                    </tr>
- 
-                </thead>
- 
-                <tbody id="routeTableBody"></tbody>
- 
-            </table>
- 
-        </div>
- 
+
+        <br>
+
+        <h3>Select Stops and Enter Distance</h3>
+
+        <table id="routeStopsTable">
+
+            <thead>
+
+                <tr>
+
+                    <th>Select</th>
+                    <th>Stop Name</th>
+                    <th>Stop Order</th>
+                    <th>Distance From Previous Stop (km)</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody id="routeStopsBody">
+
+            </tbody>
+
+        </table>
+
+        <br>
+
+        <button class="btnAdd" onclick="addRoute()">Add Route</button>
+
+        <button class="btnUpdate" onclick="updateRoute()">Update Route</button>
+
+        <button class="btnDelete" onclick="deleteRoute()">Delete Route</button>
+
+        <button class="btnClear" onclick="clearRoute()">Clear</button>
+
     </div>
- 
+
+    <div class="card">
+
+        <h2>Route List</h2>
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>Route ID</th>
+                    <th>Route Name</th>
+                    <th>Total Distance</th>
+                    <th>Stops</th>
+                    <th>Action</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody id="routeTableBody"></tbody>
+
+        </table>
+
+    </div>
+
+</div>
     <!-- ================= SCHEDULE ================= -->
  
     <div id="schedule" class="tabContent" style="display:none;">
