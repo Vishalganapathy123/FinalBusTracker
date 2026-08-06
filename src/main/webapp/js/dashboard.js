@@ -14,6 +14,15 @@ function setVal(id, val) {
   var el = document.getElementById(id);
   if (el) el.value = (val !== null && val !== undefined) ? val : "";
 }
+function formatTime(time) {
+
+    if (!time) {
+        return "";
+    }
+
+    return time;
+
+}
  
 // Sanitizes text to safely insert inside HTML string templates
 function escapeHtml(str) {
@@ -151,6 +160,80 @@ function loadRouteDropdownForBus() {
     .catch(function(err) {
       console.error(err);
     });
+}
+function loadBusDropdown() {
+
+    fetch(API + "/bus")
+
+        .then(function (res) {
+
+            return res.json();
+
+        })
+
+        .then(function (data) {
+
+            populateDropdown(
+
+                "scheduleBusId",
+
+                data,
+
+                "busId",
+
+                function (bus) {
+
+                    return bus.busNumber + " - " + bus.busName;
+
+                },
+
+                "-- Select Bus --"
+
+            );
+
+        })
+
+        .catch(function (err) {
+
+            console.error(err);
+
+        });
+
+}
+function loadRouteDropdown() {
+
+    fetch(API + "/route")
+
+        .then(function (res) {
+
+            return res.json();
+
+        })
+
+        .then(function (data) {
+
+            populateDropdown(
+
+                "scheduleRouteId",
+
+                data,
+
+                "routeId",
+
+                "routeName",
+
+                "-- Select Route --"
+
+            );
+
+        })
+
+        .catch(function (err) {
+
+            console.error(err);
+
+        });
+
 }
  
 function addBus() {
@@ -860,9 +943,25 @@ function clearSchedule() {
    INITIAL LOAD
 =========================== */
  
-window.addEventListener("DOMContentLoaded", function() {
-  loadBus();
-  loadRouteDropdownForBus();
+window.addEventListener("DOMContentLoaded", function () {
+
+    loadBus();
+
+    loadRouteDropdownForBus();
+
+    loadStop();
+
+    loadRoute();
+
+    loadStopsForRoute();
+
+    loadSchedule();
+
+    loadBusDropdown();
+
+    loadRouteDropdown();
+
+
 });
   
  
