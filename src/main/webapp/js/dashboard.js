@@ -88,10 +88,14 @@ function showTab(tabId, evt) {
       loadStopsForRoute();
       break;
     case "schedule":
-      loadSchedule();
-      loadBusDropdown();
-      loadRouteDropdown();
-      break;
+
+    loadSchedules();
+
+    loadBusDropdown();
+
+    loadRouteDropdown();
+
+    break;
   }
 }
  
@@ -955,14 +959,11 @@ window.addEventListener("DOMContentLoaded", function () {
 
     loadStopsForRoute();
 
-    loadSchedule();
+    loadSchedules();
 
     loadBusDropdown();
 
     loadRouteDropdown();
 
-
 });
-  
- 
  
