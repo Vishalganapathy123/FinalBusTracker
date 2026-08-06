@@ -14,7 +14,7 @@ import com.mongodb.client.MongoDatabase;
 
 public class MongoDBConfig {
 
-    private static final String CONNECTION_STRING = "mongodb://localhost:27017";
+    private static final String CONNECTION_STRING = "mongodb://192.168.1.171:27017";
     private static final String DATABASE_NAME = "BusTrackerDB";
 
     private static MongoDatabase database;

@@ -49,18 +49,40 @@ public class BusLocation {
     @BsonProperty("eta")
     private String eta;
 
+    // 1. Mandatory Default Constructor for MongoDB POJO Codec
     public BusLocation() {
     }
 
-    public BusLocation(String busId, double speed,
-                       String currentStopId,
-                       String nextStopId,
-                       String lastUpdated) {
+    // 2. Partial Constructor (Your existing setup)
+    public BusLocation(String busId, double speed, String currentStopId, String nextStopId, String lastUpdated) {
         this.busId = busId;
         this.speed = speed;
         this.currentStopId = currentStopId;
         this.nextStopId = nextStopId;
         this.lastUpdated = lastUpdated;
+    }
+
+    // 3. Full All-Arguments Constructor for Live Updates & Simulations
+    public BusLocation(String busId, double latitude, double longitude, double speed, 
+                       String currentStopId, String nextStopId, String lastUpdated, 
+                       String scheduleId, String routeId, String status, 
+                       double distanceCovered, double distanceRemaining, 
+                       double progress, double delayMinutes, String eta) {
+        this.busId = busId;
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.speed = speed;
+        this.currentStopId = currentStopId;
+        this.nextStopId = nextStopId;
+        this.lastUpdated = lastUpdated;
+        this.scheduleId = scheduleId;
+        this.routeId = routeId;
+        this.status = status;
+        this.distanceCovered = distanceCovered;
+        this.distanceRemaining = distanceRemaining;
+        this.progress = progress;
+        this.delayMinutes = delayMinutes;
+        this.eta = eta;
     }
 
     public String getBusId() {

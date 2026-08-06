@@ -1,45 +1,51 @@
 package repository;
- 
-import static com.mongodb.client.model.Filters.eq;
+
 import java.util.ArrayList;
 import java.util.List;
- 
+
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
- 
+import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.ReplaceOptions;
+
 import config.MongoDBConfig;
 import model.Route;
- 
+
 public class RouteRepository {
- 
-    private MongoCollection<Route> collection;
- 
+
+    private final MongoCollection<Route> collection;
+
     public RouteRepository() {
+        // Uses the centralized configuration (192.168.1.171 & BusTrackerDB with POJO codec registered)
         MongoDatabase database = MongoDBConfig.getDatabase();
-        // Automatic POJO mapping works out of the box with model.Route updates
-        collection = database.getCollection("Route", Route.class);
+        this.collection = database.getCollection("routes", Route.class);
     }
- 
-    public void addRoute(Route route) {
-        collection.insertOne(route);
-    }
- 
-    public List<Route> getAllRoutes() {
-        List<Route> routes = new ArrayList<>();
-        collection.find().into(routes);
-        return routes;
-    }
- 
-    public Route getRouteById(String routeId) {
-        return collection.find(eq("routeId", routeId)).first();
-    }
- 
+
     public void updateRoute(Route route) {
-        collection.replaceOne(eq("routeId", route.getRouteId()), route);
+        if (route == null || route.getRouteId() == null) {
+            return;
+        }
+        
+        collection.replaceOne(
+                Filters.eq("routeId", route.getRouteId()),
+                route,
+                new ReplaceOptions().upsert(true)
+        );
     }
- 
+
+    public void addRoute(Route route) {
+        updateRoute(route);
+    }
+
+    public Route getRouteById(String routeId) {
+        return collection.find(Filters.eq("routeId", routeId)).first();
+    }
+
+    public List<Route> getAllRoutes() {
+        return collection.find().into(new ArrayList<>());
+    }
+
     public void deleteRoute(String routeId) {
-        collection.deleteOne(eq("routeId", routeId));
+        collection.deleteOne(Filters.eq("routeId", routeId));
     }
 }
- 
