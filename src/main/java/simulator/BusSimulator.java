@@ -7,7 +7,6 @@ import model.RouteStop;
 import model.Schedule;
 import repository.RouteRepository;
 
-import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -35,12 +34,9 @@ public class BusSimulator implements Runnable {
 
     @Override
     public void run() {
-        String today = LocalDate.now().getDayOfWeek().name();
-
-        boolean operatesToday = schedule.getOperatingDays().stream()
-                .anyMatch(day -> day.equalsIgnoreCase(today));
-
-        if (!operatesToday || route == null || route.getRouteStops() == null || route.getRouteStops().isEmpty()) {
+        // Safety check for valid route data
+        if (route == null || route.getRouteStops() == null || route.getRouteStops().isEmpty()) {
+            ScheduleManager.removeFromActiveSchedules(schedule.getScheduleId());
             return;
         }
 
@@ -50,9 +46,17 @@ public class BusSimulator implements Runnable {
 
         double totalRouteDistance = getDistanceFromStartForStop(routeStops.size() - 1, routeStops);
 
-        long totalJourneyMinutes = java.time.Duration.between(depTime, arrTime).toMinutes();
-        if (totalJourneyMinutes <= 0) totalJourneyMinutes = 1;
-        this.speed = (totalRouteDistance / totalJourneyMinutes) * 60.0;
+        // Calculate speed accounting for dwell times at intermediate stops
+        long totalJourneySeconds = java.time.Duration.between(depTime, arrTime).getSeconds();
+        int intermediateStopsCount = Math.max(0, routeStops.size() - 2);
+        long totalDwellSeconds = intermediateStopsCount * 30L;
+
+        long netDrivingSeconds = totalJourneySeconds - totalDwellSeconds;
+        if (netDrivingSeconds <= 60) {
+            netDrivingSeconds = 60; // Fallback minimum 1 minute driving
+        }
+
+        this.speed = (totalRouteDistance / (netDrivingSeconds / 3600.0));
 
         reconstructStartupState(LocalTime.now(), depTime, arrTime, routeStops);
 
@@ -99,13 +103,14 @@ public class BusSimulator implements Runnable {
             }
 
             BusLocation payload = createBusLocationPayload(now, routeStops, totalRouteDistance);
+
             System.out.printf(
-                "Bus=%s | Status=%s | Speed=%.2f km/h | Current=%s | Next=%s | Progress=%.2f%%%n",
+                "Bus=%s | Status=%s | Speed=%.2f km/h | CurrentStop=%s (%s) | NextStop=%s (%s) | Progress=%.2f%%%n",
                 payload.getBusId(),
                 payload.getStatus(),
                 payload.getSpeed(),
-                payload.getCurrentStopId(),
-                payload.getNextStopId(),
+                payload.getCurrentStopName(), payload.getCurrentStopId(),
+                payload.getNextStopName(), payload.getNextStopId(),
                 payload.getProgress()
             );
 
@@ -121,6 +126,7 @@ public class BusSimulator implements Runnable {
             try {
                 Thread.sleep(TICK_INTERVAL_MS);
             } catch (InterruptedException e) {
+                ScheduleManager.removeFromActiveSchedules(schedule.getScheduleId());
                 Thread.currentThread().interrupt();
                 break;
             }
@@ -146,14 +152,17 @@ public class BusSimulator implements Runnable {
         double accumulatedSeconds = 0;
 
         for (int i = 0; i < stops.size() - 1; i++) {
-            double segmentDist = stops.get(i + 1).getDistanceFromPrevious();
-            double segmentDriveSeconds = (segmentDist / speed) * 3600.0;
+            double currentStopDist = getDistanceFromStartForStop(i, stops);
+            double nextStopDist = getDistanceFromStartForStop(i + 1, stops);
+            double segmentDist = nextStopDist - currentStopDist;
+
+            double segmentDriveSeconds = (speed > 0) ? (segmentDist / speed) * 3600.0 : 0;
 
             if (elapsedSeconds < accumulatedSeconds + segmentDriveSeconds) {
                 status = "RUNNING";
                 currentStopIndex = i;
                 double secondsInSegment = elapsedSeconds - accumulatedSeconds;
-                distanceCovered = getDistanceFromStartForStop(i, stops) + (speed * (secondsInSegment / 3600.0));
+                distanceCovered = currentStopDist + (speed * (secondsInSegment / 3600.0));
                 return;
             }
 
@@ -175,12 +184,15 @@ public class BusSimulator implements Runnable {
         currentStopIndex = stops.size() - 1;
     }
 
+    /**
+     * Reads distance for a target stop index directly from the list.
+     * Prevents multi-summing when database already stores cumulative values.
+     */
     private double getDistanceFromStartForStop(int index, List<RouteStop> stops) {
-        double total = 0;
-        for (int i = 0; i <= index && i < stops.size(); i++) {
-            total += stops.get(i).getDistanceFromPrevious();
+        if (stops == null || index < 0 || index >= stops.size()) {
+            return 0.0;
         }
-        return total;
+        return stops.get(index).getDistanceFromPrevious();
     }
 
     private BusLocation createBusLocationPayload(LocalTime now, List<RouteStop> stops, double totalRouteDistance) {
@@ -199,12 +211,20 @@ public class BusSimulator implements Runnable {
         data.setProgress(Math.min(100.0, progress));
 
         int safeIndex = Math.min(currentStopIndex, stops.size() - 1);
-        data.setCurrentStopId(stops.get(safeIndex).getStopId());
 
+        // Fetch & set Current Stop ID and Name
+        RouteStop currentStop = stops.get(safeIndex);
+        data.setCurrentStopId(currentStop.getStopId());
+        data.setCurrentStopName(currentStop.getStopName());
+
+        // Fetch & set Next Stop ID and Name
         if (safeIndex < stops.size() - 1) {
-            data.setNextStopId(stops.get(safeIndex + 1).getStopId());
+            RouteStop nextStop = stops.get(safeIndex + 1);
+            data.setNextStopId(nextStop.getStopId());
+            data.setNextStopName(nextStop.getStopName());
         } else {
             data.setNextStopId("DESTINATION_REACHED");
+            data.setNextStopName("Destination Reached");
         }
 
         data.setSpeed("AT_STOP".equals(status) || "WAITING".equals(status) || "COMPLETED".equals(status) ? 0.0 : speed);

@@ -7,20 +7,20 @@ public class BusLocation {
     @BsonProperty("busId")
     private String busId;
 
-    @BsonProperty("latitude")
-    private double latitude;
-
-    @BsonProperty("longitude")
-    private double longitude;
-
     @BsonProperty("speed")
     private double speed;
 
     @BsonProperty("currentStopId")
     private String currentStopId;
 
+    @BsonProperty("currentStopName")
+    private String currentStopName;
+
     @BsonProperty("nextStopId")
     private String nextStopId;
+
+    @BsonProperty("nextStopName")
+    private String nextStopName;
 
     @BsonProperty("lastUpdated")
     private String lastUpdated;
@@ -53,27 +53,30 @@ public class BusLocation {
     public BusLocation() {
     }
 
-    // 2. Partial Constructor (Your existing setup)
-    public BusLocation(String busId, double speed, String currentStopId, String nextStopId, String lastUpdated) {
+    // 2. Partial Constructor
+    public BusLocation(String busId, double speed, String currentStopId, String currentStopName, 
+                       String nextStopId, String nextStopName, String lastUpdated) {
         this.busId = busId;
         this.speed = speed;
         this.currentStopId = currentStopId;
+        this.currentStopName = currentStopName;
         this.nextStopId = nextStopId;
+        this.nextStopName = nextStopName;
         this.lastUpdated = lastUpdated;
     }
 
-    // 3. Full All-Arguments Constructor for Live Updates & Simulations
-    public BusLocation(String busId, double latitude, double longitude, double speed, 
-                       String currentStopId, String nextStopId, String lastUpdated, 
+    // 3. Full All-Arguments Constructor
+    public BusLocation(String busId, double speed, String currentStopId, String currentStopName, 
+                       String nextStopId, String nextStopName, String lastUpdated, 
                        String scheduleId, String routeId, String status, 
                        double distanceCovered, double distanceRemaining, 
                        double progress, double delayMinutes, String eta) {
         this.busId = busId;
-        this.latitude = latitude;
-        this.longitude = longitude;
         this.speed = speed;
         this.currentStopId = currentStopId;
+        this.currentStopName = currentStopName;
         this.nextStopId = nextStopId;
+        this.nextStopName = nextStopName;
         this.lastUpdated = lastUpdated;
         this.scheduleId = scheduleId;
         this.routeId = routeId;
@@ -93,22 +96,6 @@ public class BusLocation {
         this.busId = busId;
     }
 
-    public double getLatitude() {
-        return latitude;
-    }
-
-    public void setLatitude(double latitude) {
-        this.latitude = latitude;
-    }
-
-    public double getLongitude() {
-        return longitude;
-    }
-
-    public void setLongitude(double longitude) {
-        this.longitude = longitude;
-    }
-
     public double getSpeed() {
         return speed;
     }
@@ -125,12 +112,28 @@ public class BusLocation {
         this.currentStopId = currentStopId;
     }
 
+    public String getCurrentStopName() {
+        return currentStopName;
+    }
+
+    public void setCurrentStopName(String currentStopName) {
+        this.currentStopName = currentStopName;
+    }
+
     public String getNextStopId() {
         return nextStopId;
     }
 
     public void setNextStopId(String nextStopId) {
         this.nextStopId = nextStopId;
+    }
+
+    public String getNextStopName() {
+        return nextStopName;
+    }
+
+    public void setNextStopName(String nextStopName) {
+        this.nextStopName = nextStopName;
     }
 
     public String getLastUpdated() {
@@ -213,9 +216,9 @@ public class BusLocation {
                 ", routeId='" + routeId + '\'' +
                 ", status='" + status + '\'' +
                 ", currentStopId='" + currentStopId + '\'' +
+                ", currentStopName='" + currentStopName + '\'' +
                 ", nextStopId='" + nextStopId + '\'' +
-                ", latitude=" + latitude +
-                ", longitude=" + longitude +
+                ", nextStopName='" + nextStopName + '\'' +
                 ", speed=" + speed +
                 ", distanceCovered=" + distanceCovered +
                 ", distanceRemaining=" + distanceRemaining +

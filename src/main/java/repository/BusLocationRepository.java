@@ -17,16 +17,16 @@ public class BusLocationRepository {
     private final MongoCollection<BusLocation> collection;
 
     public BusLocationRepository() {
-        // Uses centralized MongoDB connection (192.168.1.171 / BusTrackerDB)
+        // Uses centralized MongoDB connection
         MongoDatabase database = MongoDBConfig.getDatabase();
         
-        // Ensure this collection name matches your MongoDB collection exactly
+        // MongoCollection<BusLocation> maps all fields including stop names via BsonProperty annotations
         this.collection = database.getCollection("BusLocation", BusLocation.class);
     }
 
     /**
      * Atomic Upsert (Save or Update).
-     * Replaces existing document by busId or inserts if it doesn't exist.
+     * Automatically writes currentStopName and nextStopName to MongoDB alongside IDs.
      */
     public void saveOrUpdateBusLocation(BusLocation busLocation) {
         if (busLocation == null || busLocation.getBusId() == null || busLocation.getBusId().trim().isEmpty()) {
@@ -40,12 +40,12 @@ public class BusLocationRepository {
         );
     }
 
-    // Add Bus Location (Delegates to saveOrUpdateBusLocation to prevent duplicate key errors)
+    // Add Bus Location (Delegates to saveOrUpdateBusLocation)
     public void addBusLocation(BusLocation busLocation) {
         saveOrUpdateBusLocation(busLocation);
     }
 
-    // Get All Bus Locations
+    // Get All Bus Locations (Includes currentStopName and nextStopName on populated models)
     public List<BusLocation> getAllBusLocations() {
         List<BusLocation> locationList = new ArrayList<>();
         collection.find().into(locationList);
