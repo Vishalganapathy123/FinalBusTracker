@@ -558,212 +558,6 @@ function clearRoute() {
    SCHEDULE CRUD
 =========================== */
  
-function loadSchedule() {
-  fetch(API + "/schedule")
-    .then(function(res) { return res.json(); })
-    .then(function(data) {
-      var body = document.getElementById("scheduleTableBody");
-      if (!body) return;
- 
-      body.innerHTML = data
-        .map(function(schedule) {
-          var rawDays = schedule.operatingDays || schedule.day;
-          var dayVal = Array.isArray(rawDays) ? rawDays.join(", ") : (rawDays || "");
- 
-          return (
-            "<tr>" +
-            "<td>" + escapeHtml(schedule.scheduleId) + "</td>" +
-            "<td>" + escapeHtml(schedule.busId) + "</td>" +
-            "<td>" + escapeHtml(schedule.routeId) + "</td>" +
-            "<td>" + escapeHtml(schedule.departureTime) + "</td>" +
-            "<td>" + escapeHtml(schedule.arrivalTime) + "</td>" +
-            "<td>" + escapeHtml(dayVal) + "</td>" +
-            "<td>" +
-            '<button class="btnUpdate" ' +
-            'data-id="' + escapeHtml(schedule.scheduleId) + '" ' +
-            'data-bus="' + escapeHtml(schedule.busId) + '" ' +
-            'data-route="' + escapeHtml(schedule.routeId) + '" ' +
-            'data-dep="' + escapeHtml(schedule.departureTime) + '" ' +
-            'data-arr="' + escapeHtml(schedule.arrivalTime) + '" ' +
-            'data-day="' + escapeHtml(dayVal) + '" ' +
-            'onclick="handleEditSchedule(this)">Edit</button>' +
-            "</td>" +
-            "</tr>"
-          );
-        })
-        .join("");
-    })
-    .catch(function(err) {
-      console.error(err);
-    });
-}
- 
-function handleEditSchedule(btn) {
-  var d = btn.dataset;
-  editSchedule(d.id, d.bus, d.route, d.dep, d.arr, d.day);
-}
- 
-function loadBusDropdown() {
-  fetch(API + "/bus")
-    .then(function(res) { return res.json(); })
-    .then(function(data) {
-      populateDropdown(
-        "scheduleBusId",
-        data,
-        "busId",
-        function(b) { return b.busNumber + " (" + b.busName + ")"; },
-        "-- Select Bus --"
-      );
-    })
-    .catch(function(err) {
-      console.error(err);
-    });
-}
- 
-function loadRouteDropdown() {
-  fetch(API + "/route")
-    .then(function(res) { return res.json(); })
-    .then(function(data) {
-      populateDropdown("scheduleRouteId", data, "routeId", "routeName", "-- Select Route --");
-    })
-    .catch(function(err) {
-      console.error(err);
-    });
-}
- 
-function formatTime(timeStr) {
-  return (timeStr && timeStr.length === 5) ? timeStr + ":00" : (timeStr || "");
-}
- 
-function addSchedule() {
-  var daySelected = getVal("day");
- 
-  var schedule = {
-
-    scheduleId: getVal("scheduleId"),
-
-    busId: getVal("scheduleBusId"),
-
-    routeId: getVal("scheduleRouteId"),
-
-    sourceName: getVal("sourceName"),
-
-    destinationName: getVal("destinationName"),
-
-    departureTime: formatTime(getVal("departureTime")),
-
-    arrivalTime: formatTime(getVal("arrivalTime")),
-
-    operatingDays: daySelected ? [daySelected] : []
-
-};
- 
-  fetch(API + "/schedule", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(schedule)
-  })
-    .then(function(res) {
-      if (!res.ok) {
-        return res.text().then(function(text) {
-          throw new Error(text || "Failed to add schedule");
-        });
-      }
-      alert("Schedule Added Successfully");
-      clearSchedule();
-      loadSchedule();
-    })
-    .catch(function(err) {
-      alert("Error: " + err.message);
-    });
-}
- 
-function editSchedule(id, busId, routeId, departure, arrival, day) {
-  setVal("scheduleId", id);
-  setVal("scheduleBusId", busId);
-  setVal("scheduleRouteId", routeId);
-  setVal("departureTime", departure);
-  setVal("arrivalTime", arrival);
-  setVal("day", day);
-}
- 
-function updateSchedule() {
-  var daySelected = getVal("day");
- 
- var schedule = {
-
-    scheduleId: getVal("scheduleId"),
-
-    busId: getVal("scheduleBusId"),
-
-    routeId: getVal("scheduleRouteId"),
-
-    sourceName: getVal("sourceName"),
-
-    destinationName: getVal("destinationName"),
-
-    departureTime: formatTime(getVal("departureTime")),
-
-    arrivalTime: formatTime(getVal("arrivalTime")),
-
-    operatingDays: daySelected ? [daySelected] : []
-
-};
- 
-  fetch(API + "/schedule", {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(schedule)
-  })
-    .then(function(res) {
-      if (!res.ok) {
-        return res.text().then(function(text) {
-          throw new Error(text || "Failed to update schedule");
-        });
-      }
-      alert("Schedule Updated Successfully");
-      clearSchedule();
-      loadSchedule();
-    })
-    .catch(function(err) {
-      alert("Error: " + err.message);
-    });
-}
- 
-function deleteSchedule() {
-  var id = getVal("scheduleId");
-  if (!id) return alert("Please specify a Schedule ID to delete.");
- 
-  fetch(API + "/schedule/" + id, { method: "DELETE" })
-    .then(function(res) {
-      if (!res.ok) {
-        return res.text().then(function(text) {
-          throw new Error(text || "Failed to delete schedule");
-        });
-      }
-      alert("Schedule Deleted Successfully");
-      clearSchedule();
-      loadSchedule();
-    })
-    .catch(function(err) {
-      alert("Error: " + err.message);
-    });
-}
- 
-function clearSchedule() {
-  setVal("scheduleId", "");
-  setVal("departureTime", "");
-  setVal("arrivalTime", "");
- 
-  var busSelect = document.getElementById("scheduleBusId");
-  if (busSelect) busSelect.selectedIndex = 0;
- 
-  var routeSelect = document.getElementById("scheduleRouteId");
-  if (routeSelect) routeSelect.selectedIndex = 0;
- 
-  var day = document.getElementById("day");
-  if (day) day.selectedIndex = 0;
-}
 function loadSourceDestination() {
 
     var routeId = getVal("scheduleRouteId");
@@ -775,17 +569,19 @@ function loadSourceDestination() {
         return;
     }
 
-    fetch(API + "/route/" + routeId)
+    fetch(API + "/route/" + encodeURIComponent(routeId))
 
-        .then(function(res) {
+        .then(function (response) {
 
-            if (!res.ok)
+            if (!response.ok) {
                 throw new Error("Route not found");
+            }
 
-            return res.json();
+            return response.json();
+
         })
 
-        .then(function(route) {
+        .then(function (route) {
 
             if (!route.routeStops || route.routeStops.length === 0) {
 
@@ -794,37 +590,272 @@ function loadSourceDestination() {
                 return;
             }
 
-            // Sort by stop order
-            route.routeStops.sort(function(a, b) {
+            route.routeStops.sort(function (a, b) {
 
                 return a.stopOrder - b.stopOrder;
 
             });
 
-            // First stop
-            setVal(
-                "sourceName",
-                route.routeStops[0].stopName
-            );
+            setVal("sourceName", route.routeStops[0].stopName);
 
-            // Last stop
             setVal(
                 "destinationName",
-                route.routeStops[
-                    route.routeStops.length - 1
-                ].stopName
+                route.routeStops[route.routeStops.length - 1].stopName
             );
 
         })
 
-        .catch(function(err) {
+        .catch(function (error) {
 
-            console.error(err);
+            console.error(error);
 
         });
 
 }
- 
+function addSchedule() {
+
+    var daySelected = getVal("day");
+
+    var schedule = {
+
+        scheduleId: getVal("scheduleId"),
+
+        busId: getVal("scheduleBusId"),
+
+        routeId: getVal("scheduleRouteId"),
+
+        sourceName: getVal("sourceName"),
+
+        destinationName: getVal("destinationName"),
+
+        departureTime: formatTime(getVal("departureTime")),
+
+        arrivalTime: formatTime(getVal("arrivalTime")),
+
+        operatingDays: daySelected ? [daySelected] : []
+
+    };
+
+    fetch(API + "/schedule", {
+
+        method: "POST",
+
+        headers: {
+            "Content-Type": "application/json"
+        },
+
+        body: JSON.stringify(schedule)
+
+    })
+
+    .then(function () {
+
+        loadSchedules();
+
+        clearSchedule();
+
+    })
+
+    .catch(function (error) {
+
+        console.error(error);
+
+    });
+
+}
+function updateSchedule() {
+
+    var daySelected = getVal("day");
+
+    var schedule = {
+
+        scheduleId: getVal("scheduleId"),
+
+        busId: getVal("scheduleBusId"),
+
+        routeId: getVal("scheduleRouteId"),
+
+        sourceName: getVal("sourceName"),
+
+        destinationName: getVal("destinationName"),
+
+        departureTime: formatTime(getVal("departureTime")),
+
+        arrivalTime: formatTime(getVal("arrivalTime")),
+
+        operatingDays: daySelected ? [daySelected] : []
+
+    };
+
+    fetch(API + "/schedule", {
+
+        method: "PUT",
+
+        headers: {
+            "Content-Type": "application/json"
+        },
+
+        body: JSON.stringify(schedule)
+
+    })
+
+    .then(function () {
+
+        loadSchedules();
+
+        clearSchedule();
+
+    })
+
+    .catch(function (error) {
+
+        console.error(error);
+
+    });
+
+}
+function deleteSchedule(scheduleId) {
+
+    if (!confirm("Delete this Schedule?")) {
+        return;
+    }
+
+    fetch(API + "/schedule/" + encodeURIComponent(scheduleId), {
+
+        method: "DELETE"
+
+    })
+
+    .then(function () {
+
+        loadSchedules();
+
+        clearSchedule();
+
+    })
+
+    .catch(function (error) {
+
+        console.error(error);
+
+    });
+
+}
+function editSchedule(schedule) {
+
+    setVal("scheduleId", schedule.scheduleId);
+
+    setVal("scheduleBusId", schedule.busId);
+
+    setVal("scheduleRouteId", schedule.routeId);
+
+    setVal("sourceName", schedule.sourceName);
+
+    setVal("destinationName", schedule.destinationName);
+
+    setVal("departureTime", schedule.departureTime);
+
+    setVal("arrivalTime", schedule.arrivalTime);
+
+    if (schedule.operatingDays &&
+        schedule.operatingDays.length > 0) {
+
+        setVal("day", schedule.operatingDays[0]);
+
+    }
+
+}
+function loadSchedules() {
+
+    fetch(API + "/schedule")
+
+        .then(function (response) {
+
+            return response.json();
+
+        })
+
+        .then(function (schedules) {
+
+            var tbody = document.getElementById("scheduleTableBody");
+
+            tbody.innerHTML = "";
+
+            schedules.forEach(function (schedule) {
+
+                var days = "";
+
+                if (schedule.operatingDays &&
+                    schedule.operatingDays.length > 0) {
+
+                    days = schedule.operatingDays.join(", ");
+
+                }
+
+                tbody.innerHTML +=
+
+                    "<tr>" +
+
+                    "<td>" + escapeHtml(schedule.scheduleId) + "</td>" +
+
+                    "<td>" + escapeHtml(schedule.busId) + "</td>" +
+
+                    "<td>" + escapeHtml(schedule.routeId) + "</td>" +
+
+                    "<td>" + escapeHtml(schedule.sourceName) + "</td>" +
+
+                    "<td>" + escapeHtml(schedule.destinationName) + "</td>" +
+
+                    "<td>" + escapeHtml(schedule.departureTime) + "</td>" +
+
+                    "<td>" + escapeHtml(schedule.arrivalTime) + "</td>" +
+
+                    "<td>" + escapeHtml(days) + "</td>" +
+
+                    "<td>" +
+
+                    "<button onclick='editSchedule(" +
+                    JSON.stringify(schedule).replace(/'/g, "\\'") +
+                    ")'>Edit</button> " +
+
+                    "<button onclick=\"deleteSchedule('" +
+                    schedule.scheduleId +
+                    "')\">Delete</button>" +
+
+                    "</td>" +
+
+                    "</tr>";
+
+            });
+
+        })
+
+        .catch(function (error) {
+
+            console.error(error);
+
+        });
+
+}
+function clearSchedule() {
+
+    setVal("scheduleId", "");
+
+    setVal("scheduleBusId", "");
+
+    setVal("scheduleRouteId", "");
+
+    setVal("sourceName", "");
+
+    setVal("destinationName", "");
+
+    setVal("departureTime", "");
+
+    setVal("arrivalTime", "");
+
+    setVal("day", "Monday");
+
+}
 /* ===========================
    INITIAL LOAD
 =========================== */
