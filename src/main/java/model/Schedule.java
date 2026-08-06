@@ -2,12 +2,10 @@ package model;
 
 import java.util.List;
 
-import org.bson.codecs.pojo.annotations.BsonId;
 import org.bson.codecs.pojo.annotations.BsonProperty;
 
 public class Schedule {
 
-    @BsonId
     @BsonProperty("scheduleId")
     private String scheduleId;
 

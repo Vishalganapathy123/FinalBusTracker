@@ -1,11 +1,9 @@
 package model;
 
-import org.bson.codecs.pojo.annotations.BsonId;
 import org.bson.codecs.pojo.annotations.BsonProperty;
 
 public class BusLocation {
 
-    @BsonId
     @BsonProperty("busId")
     private String busId;
 
@@ -18,40 +16,52 @@ public class BusLocation {
     @BsonProperty("speed")
     private double speed;
 
-    @BsonProperty("currentStop")
+    @BsonProperty("currentStopId")
     private String currentStopId;
 
-    @BsonProperty("nextStop")
+    @BsonProperty("nextStopId")
     private String nextStopId;
 
     @BsonProperty("lastUpdated")
     private String lastUpdated;
 
-    // Tracking & Simulator Payload Fields
+    @BsonProperty("scheduleId")
     private String scheduleId;
+
+    @BsonProperty("routeId")
     private String routeId;
+
+    @BsonProperty("status")
     private String status;
+
+    @BsonProperty("distanceCovered")
     private double distanceCovered;
+
+    @BsonProperty("distanceRemaining")
     private double distanceRemaining;
+
+    @BsonProperty("progress")
     private double progress;
+
+    @BsonProperty("delayMinutes")
     private double delayMinutes;
+
+    @BsonProperty("eta")
     private String eta;
 
-    // Default Constructor
     public BusLocation() {
     }
 
-    // Parameterized Constructor
-    public BusLocation(String busId, double speed, String currentStopId,
-                       String nextStopId, String lastUpdated) {
+    public BusLocation(String busId, double speed,
+                       String currentStopId,
+                       String nextStopId,
+                       String lastUpdated) {
         this.busId = busId;
         this.speed = speed;
         this.currentStopId = currentStopId;
         this.nextStopId = nextStopId;
         this.lastUpdated = lastUpdated;
     }
-
-    // ---------------- Bus Details ----------------
 
     public String getBusId() {
         return busId;
@@ -108,8 +118,6 @@ public class BusLocation {
     public void setLastUpdated(String lastUpdated) {
         this.lastUpdated = lastUpdated;
     }
-
-    // ---------------- Simulator Fields ----------------
 
     public String getScheduleId() {
         return scheduleId;

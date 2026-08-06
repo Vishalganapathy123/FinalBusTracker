@@ -2,20 +2,15 @@ package model;
 
 import java.util.List;
 
-import org.bson.codecs.pojo.annotations.BsonId;
 import org.bson.codecs.pojo.annotations.BsonProperty;
 
 public class Route {
 
-    @BsonId
     @BsonProperty("routeId")
     private String routeId;
 
-    @BsonProperty("source")
-    private String source;
-
-    @BsonProperty("destination")
-    private String destination;
+    @BsonProperty("routeName")
+    private String routeName;
 
     @BsonProperty("distance")
     private double distance;
@@ -26,11 +21,10 @@ public class Route {
     public Route() {
     }
 
-    public Route(String routeId, String source, String destination,
+    public Route(String routeId, String routeName,
                  double distance, List<RouteStop> routeStops) {
         this.routeId = routeId;
-        this.source = source;
-        this.destination = destination;
+        this.routeName = routeName;
         this.distance = distance;
         this.routeStops = routeStops;
     }
@@ -43,20 +37,12 @@ public class Route {
         this.routeId = routeId;
     }
 
-    public String getSource() {
-        return source;
+    public String getRouteName() {
+        return routeName;
     }
 
-    public void setSource(String source) {
-        this.source = source;
-    }
-
-    public String getDestination() {
-        return destination;
-    }
-
-    public void setDestination(String destination) {
-        this.destination = destination;
+    public void setRouteName(String routeName) {
+        this.routeName = routeName;
     }
 
     public double getDistance() {
@@ -79,8 +65,7 @@ public class Route {
     public String toString() {
         return "Route{" +
                 "routeId='" + routeId + '\'' +
-                ", source='" + source + '\'' +
-                ", destination='" + destination + '\'' +
+                ", routeName='" + routeName + '\'' +
                 ", distance=" + distance +
                 ", routeStops=" + routeStops +
                 '}';
