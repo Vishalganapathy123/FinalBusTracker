@@ -1,409 +1,184 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, Helvetica, sans-serif;
+}
 
- 
 body {
-
     background: #f4f6f9;
-
     padding: 20px;
-
 }
- 
+
 .container {
-
     width: 95%;
-
     margin: auto;
-
 }
- 
+
 h1 {
-
     text-align: center;
-
     margin-bottom: 20px;
-
     color: #2c3e50;
-
 }
- 
+
 .tabs {
-
     display: flex;
-
     gap: 10px;
-
     margin-bottom: 20px;
-
 }
- 
+
 .tabButton {
-
     padding: 12px 25px;
-
     border: none;
-
     background: #3498db;
-
     color: white;
-
     cursor: pointer;
-
     border-radius: 5px;
-
     font-size: 15px;
-
     transition: background 0.2s ease;
-
 }
- 
+
 .tabButton:hover {
-
     background: #2980b9;
-
 }
- 
+
 .tabButton.active {
-
     background: #2c3e50;
-
 }
- 
+
 .card {
-
     background: white;
-
     padding: 20px;
-
     border-radius: 8px;
-
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-
     margin-bottom: 20px;
-
 }
- 
+
 .card h2 {
-
     margin-bottom: 20px;
-
     color: #34495e;
-
 }
- 
+
 .formGrid {
-
     display: grid;
-
     grid-template-columns: repeat(2, 1fr);
-
     gap: 15px;
-
 }
- 
+
 .formGroup {
-
     display: flex;
-
     flex-direction: column;
-
 }
- 
-/* Span full width across 2 columns for large controls like multi-select when needed */
 
 .formGroup.fullWidth {
-
     grid-column: span 2;
-
 }
- 
+
 .formGroup label {
-
     margin-bottom: 6px;
-
     font-weight: bold;
-
     color: #2c3e50;
-
 }
- 
+
 .formGroup input,
-
 .formGroup select {
-
     padding: 10px;
-
     border: 1px solid #ccc;
-
     border-radius: 5px;
-
     font-size: 14px;
-
     outline: none;
-
     transition: border-color 0.2s;
-
 }
- 
+
 .formGroup input:focus,
-
 .formGroup select:focus {
-
     border-color: #3498db;
-
 }
- 
-/* Specific styling for multi-select dropdown (Stops list) */
 
-.formGroup select[multiple] {
-
-    padding: 5px;
-
-    height: 120px;
-
-}
- 
-.formGroup select[multiple] option {
-
-    padding: 6px 10px;
-
-    border-bottom: 1px solid #f0f0f0;
-
-    cursor: pointer;
-
-}
- 
-.formGroup select[multiple] option:hover {
-
-    background-color: #ebf5fb;
-
-}
- 
-button {
-
-    padding: 10px 18px;
-
-    border: none;
-
-    color: white;
-
-    cursor: pointer;
-
-    border-radius: 5px;
-
-    margin-right: 10px;
-
-    margin-top: 10px;
-
-    font-weight: bold;
-
-    transition: background 0.2s ease;
-
-}
- 
-.btnAdd {
-
-    background: #27ae60;
-
-}
- 
-.btnUpdate {
-
-    background: #f39c12;
-
-}
- 
-.btnDelete {
-
-    background: #e74c3c;
-
-}
- 
-.btnClear {
-
-    background: #7f8c8d;
-
-}
- 
-.btnAdd:hover {
-
-    background: #229954;
-
-}
- 
-.btnUpdate:hover {
-
-    background: #d68910;
-
-}
- 
-.btnDelete:hover {
-
-    background: #c0392b;
-
-}
- 
-.btnClear:hover {
-
-    background: #616a6b;
-
-}
- 
-table {
-
-    width: 100%;
-
-    border-collapse: collapse;
-
-    margin-top: 15px;
-
-}
- 
-table th {
-
-    background: #3498db;
-
-    color: white;
-
+/* Checkbox Grid for Operating Days */
+.daysCheckboxGroup {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
     padding: 12px;
-
-    text-align: center;
-
-}
- 
-table td {
-
-    border: 1px solid #ddd;
-
-    padding: 10px;
-
-    text-align: center;
-
-    vertical-align: middle;
-
-}
- 
-table tr:nth-child(even) {
-
-    background: #f8f9fa;
-
-}
- 
-table tr:hover {
-
-    background: #ecf0f1;
-
-}
- 
-table button {
-
-    background: #3498db;
-
-    margin: 2px;
-
-    padding: 6px 12px;
-
-}
- 
-table button:hover {
-
-    background: #21618c;
-
-}
- 
-/* Responsive adjustments */
-
-@media (max-width: 768px) {
-
-    .formGrid {
-
-        grid-template-columns: 1fr;
-
-    }
- 
-    .formGroup.fullWidth {
-
-        grid-column: span 1;
-
-    }
- 
-    .tabs {
-
-        flex-direction: column;
-
-    }
- 
-    table {
-
-        display: block;
-
-        overflow-x: auto;
-
-    }
-
-}
-/* ===========================
-   ROUTE STOPS TABLE
-=========================== */
-
-#routeStopsTable {
-
-    width: 100%;
-
-    border-collapse: collapse;
-
-    margin-top: 15px;
-
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background: #fafafa;
 }
 
-#routeStopsTable th {
+.dayCheckboxLabel {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+    font-weight: normal;
+    cursor: pointer;
+}
 
-    background: #3498db;
+.dayCheckboxLabel input[type="checkbox"] {
+    cursor: pointer;
+    transform: scale(1.1);
+}
 
+button {
+    padding: 10px 18px;
+    border: none;
     color: white;
-
-    padding: 10px;
-
-    text-align: center;
-
+    cursor: pointer;
+    border-radius: 5px;
+    margin-right: 10px;
+    margin-top: 10px;
+    font-weight: bold;
+    transition: background 0.2s ease;
 }
 
-#routeStopsTable td {
+.btnAdd { background: #27ae60; }
+.btnUpdate { background: #f39c12; }
+.btnDelete { background: #e74c3c; }
+.btnClear { background: #7f8c8d; }
 
+.btnAdd:hover { background: #229954; }
+.btnUpdate:hover { background: #d68910; }
+.btnDelete:hover { background: #c0392b; }
+.btnClear:hover { background: #616a6b; }
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+table th {
+    background: #3498db;
+    color: white;
+    padding: 12px;
+    text-align: center;
+}
+
+table td {
     border: 1px solid #ddd;
-
-    padding: 8px;
-
+    padding: 10px;
     text-align: center;
-
+    vertical-align: middle;
 }
+
+table tr:nth-child(even) { background: #f8f9fa; }
+table tr:hover { background: #ecf0f1; }
 
 #routeStopsTable input[type="number"] {
-
     width: 70px;
-
     padding: 5px;
-
     text-align: center;
-
 }
 
 #routeStopsTable input[type="checkbox"] {
-
     transform: scale(1.2);
-
     cursor: pointer;
-
 }
 
-#routeStopsTable tr:nth-child(even) {
-
-    background: #f8f9fa;
-
+@media (max-width: 768px) {
+    .formGrid { grid-template-columns: 1fr; }
+    .formGroup.fullWidth { grid-column: span 1; }
+    .tabs { flex-direction: column; }
+    table { display: block; overflow-x: auto; }
 }
-
-#routeStopsTable tr:hover {
-
-    background: #ecf0f1;
-
-}
- 

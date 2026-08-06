@@ -11,8 +11,11 @@ public class Route {
     @BsonProperty("routeId")
     private String routeId;
 
-    @BsonProperty("routeName")
-    private String routeName;
+    @BsonProperty("source")
+    private String source;
+
+    @BsonProperty("destination")
+    private String destination;
 
     @BsonProperty("distance")
     private double distance;
@@ -23,16 +26,63 @@ public class Route {
     public Route() {
     }
 
-    public Route(String routeId,
-                 String routeName,
-                 double distance,
-                 List<RouteStop> routeStops) {
-
+    public Route(String routeId, String source, String destination,
+                 double distance, List<RouteStop> routeStops) {
         this.routeId = routeId;
-        this.routeName = routeName;
+        this.source = source;
+        this.destination = destination;
         this.distance = distance;
         this.routeStops = routeStops;
     }
 
-    // Getters and Setters
+    public String getRouteId() {
+        return routeId;
+    }
+
+    public void setRouteId(String routeId) {
+        this.routeId = routeId;
+    }
+
+    public String getSource() {
+        return source;
+    }
+
+    public void setSource(String source) {
+        this.source = source;
+    }
+
+    public String getDestination() {
+        return destination;
+    }
+
+    public void setDestination(String destination) {
+        this.destination = destination;
+    }
+
+    public double getDistance() {
+        return distance;
+    }
+
+    public void setDistance(double distance) {
+        this.distance = distance;
+    }
+
+    public List<RouteStop> getRouteStops() {
+        return routeStops;
+    }
+
+    public void setRouteStops(List<RouteStop> routeStops) {
+        this.routeStops = routeStops;
+    }
+
+    @Override
+    public String toString() {
+        return "Route{" +
+                "routeId='" + routeId + '\'' +
+                ", source='" + source + '\'' +
+                ", destination='" + destination + '\'' +
+                ", distance=" + distance +
+                ", routeStops=" + routeStops +
+                '}';
+    }
 }
