@@ -2,15 +2,22 @@ package model;
 
 import java.util.List;
 
+import org.bson.codecs.pojo.annotations.BsonId;
+import org.bson.codecs.pojo.annotations.BsonProperty;
+
 public class Route {
 
+    @BsonId
+    @BsonProperty("routeId")
     private String routeId;
+
+    @BsonProperty("routeName")
     private String routeName;
 
-    // Total route distance
+    @BsonProperty("distance")
     private double distance;
 
-    // Stops with order and distance
+    @BsonProperty("routeStops")
     private List<RouteStop> routeStops;
 
     public Route() {
@@ -27,35 +34,5 @@ public class Route {
         this.routeStops = routeStops;
     }
 
-    public String getRouteId() {
-        return routeId;
-    }
-
-    public void setRouteId(String routeId) {
-        this.routeId = routeId;
-    }
-
-    public String getRouteName() {
-        return routeName;
-    }
-
-    public void setRouteName(String routeName) {
-        this.routeName = routeName;
-    }
-
-    public double getDistance() {
-        return distance;
-    }
-
-    public void setDistance(double distance) {
-        this.distance = distance;
-    }
-
-    public List<RouteStop> getRouteStops() {
-        return routeStops;
-    }
-
-    public void setRouteStops(List<RouteStop> routeStops) {
-        this.routeStops = routeStops;
-    }
+    // Getters and Setters
 }
