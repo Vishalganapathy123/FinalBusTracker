@@ -348,7 +348,7 @@
  
                     <label>Route</label>
  
-                    <select id="scheduleRouteId"></select>
+                    <select id="scheduleRouteId" onchange="loadSourceDestination()"></select>
  
                 </div>
  
