@@ -639,13 +639,24 @@ function addSchedule() {
   var daySelected = getVal("day");
  
   var schedule = {
+
     scheduleId: getVal("scheduleId"),
+
     busId: getVal("scheduleBusId"),
+
     routeId: getVal("scheduleRouteId"),
+
+    sourceName: getVal("sourceName"),
+
+    destinationName: getVal("destinationName"),
+
     departureTime: formatTime(getVal("departureTime")),
+
     arrivalTime: formatTime(getVal("arrivalTime")),
+
     operatingDays: daySelected ? [daySelected] : []
-  };
+
+};
  
   fetch(API + "/schedule", {
     method: "POST",
@@ -679,14 +690,25 @@ function editSchedule(id, busId, routeId, departure, arrival, day) {
 function updateSchedule() {
   var daySelected = getVal("day");
  
-  var schedule = {
+ var schedule = {
+
     scheduleId: getVal("scheduleId"),
+
     busId: getVal("scheduleBusId"),
+
     routeId: getVal("scheduleRouteId"),
+
+    sourceName: getVal("sourceName"),
+
+    destinationName: getVal("destinationName"),
+
     departureTime: formatTime(getVal("departureTime")),
+
     arrivalTime: formatTime(getVal("arrivalTime")),
+
     operatingDays: daySelected ? [daySelected] : []
-  };
+
+};
  
   fetch(API + "/schedule", {
     method: "PUT",
@@ -741,6 +763,66 @@ function clearSchedule() {
  
   var day = document.getElementById("day");
   if (day) day.selectedIndex = 0;
+}
+function loadSourceDestination() {
+
+    var routeId = getVal("scheduleRouteId");
+
+    if (!routeId) {
+
+        setVal("sourceName", "");
+        setVal("destinationName", "");
+        return;
+    }
+
+    fetch(API + "/route/" + routeId)
+
+        .then(function(res) {
+
+            if (!res.ok)
+                throw new Error("Route not found");
+
+            return res.json();
+        })
+
+        .then(function(route) {
+
+            if (!route.routeStops || route.routeStops.length === 0) {
+
+                setVal("sourceName", "");
+                setVal("destinationName", "");
+                return;
+            }
+
+            // Sort by stop order
+            route.routeStops.sort(function(a, b) {
+
+                return a.stopOrder - b.stopOrder;
+
+            });
+
+            // First stop
+            setVal(
+                "sourceName",
+                route.routeStops[0].stopName
+            );
+
+            // Last stop
+            setVal(
+                "destinationName",
+                route.routeStops[
+                    route.routeStops.length - 1
+                ].stopName
+            );
+
+        })
+
+        .catch(function(err) {
+
+            console.error(err);
+
+        });
+
 }
  
 /* ===========================
