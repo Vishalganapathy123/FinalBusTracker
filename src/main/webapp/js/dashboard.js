@@ -1,4 +1,4 @@
-[3:58 PM] Madhumitha M
+
 var API = window.location.origin + "/BusTracker/api/admin";
  
 /* ===========================
@@ -312,7 +312,7 @@ function updateStop() {
       alert("Error: " + err.message);
     });
 }
-[3:58 PM] Madhumitha M
+
 function deleteStop() {
   var id = getVal("stopId");
   if (!id) return alert("Please specify a Stop ID to delete.");
@@ -552,7 +552,7 @@ function clearRoute() {
     if (dist) dist.value = "";
   }
 }
- [3:58 PM] Madhumitha M
+
  
 /* ===========================
    SCHEDULE CRUD
